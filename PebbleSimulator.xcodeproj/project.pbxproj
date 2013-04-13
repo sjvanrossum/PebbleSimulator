@@ -1,0 +1,309 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		EA3F7BCC1719D926001BD65B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA3F7BCB1719D926001BD65B /* Cocoa.framework */; };
+		EA3F7BD61719D926001BD65B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EA3F7BD41719D926001BD65B /* InfoPlist.strings */; };
+		EA3F7BD81719D926001BD65B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3F7BD71719D926001BD65B /* main.m */; };
+		EA3F7BDC1719D926001BD65B /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = EA3F7BDA1719D926001BD65B /* Credits.rtf */; };
+		EA3F7BDF1719D926001BD65B /* SRAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3F7BDE1719D926001BD65B /* SRAppDelegate.m */; };
+		EA3F7BE21719D926001BD65B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA3F7BE01719D926001BD65B /* MainMenu.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		EA3F7BC81719D926001BD65B /* PebbleSimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PebbleSimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA3F7BCB1719D926001BD65B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		EA3F7BCE1719D926001BD65B /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		EA3F7BCF1719D926001BD65B /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		EA3F7BD01719D926001BD65B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		EA3F7BD31719D926001BD65B /* PebbleSimulator-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PebbleSimulator-Info.plist"; sourceTree = "<group>"; };
+		EA3F7BD51719D926001BD65B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		EA3F7BD71719D926001BD65B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		EA3F7BD91719D926001BD65B /* PebbleSimulator-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PebbleSimulator-Prefix.pch"; sourceTree = "<group>"; };
+		EA3F7BDB1719D926001BD65B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
+		EA3F7BDD1719D926001BD65B /* SRAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRAppDelegate.h; sourceTree = "<group>"; };
+		EA3F7BDE1719D926001BD65B /* SRAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRAppDelegate.m; sourceTree = "<group>"; };
+		EA3F7BE11719D926001BD65B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		EA3F7BC51719D926001BD65B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA3F7BCC1719D926001BD65B /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		EA3F7BBF1719D926001BD65B = {
+			isa = PBXGroup;
+			children = (
+				EA3F7BD11719D926001BD65B /* PebbleSimulator */,
+				EA3F7BCA1719D926001BD65B /* Frameworks */,
+				EA3F7BC91719D926001BD65B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		EA3F7BC91719D926001BD65B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EA3F7BC81719D926001BD65B /* PebbleSimulator.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		EA3F7BCA1719D926001BD65B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EA3F7BCB1719D926001BD65B /* Cocoa.framework */,
+				EA3F7BCD1719D926001BD65B /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		EA3F7BCD1719D926001BD65B /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EA3F7BCE1719D926001BD65B /* AppKit.framework */,
+				EA3F7BCF1719D926001BD65B /* CoreData.framework */,
+				EA3F7BD01719D926001BD65B /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		EA3F7BD11719D926001BD65B /* PebbleSimulator */ = {
+			isa = PBXGroup;
+			children = (
+				EA3F7BDD1719D926001BD65B /* SRAppDelegate.h */,
+				EA3F7BDE1719D926001BD65B /* SRAppDelegate.m */,
+				EA3F7BE01719D926001BD65B /* MainMenu.xib */,
+				EA3F7BD21719D926001BD65B /* Supporting Files */,
+			);
+			path = PebbleSimulator;
+			sourceTree = "<group>";
+		};
+		EA3F7BD21719D926001BD65B /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				EA3F7BD31719D926001BD65B /* PebbleSimulator-Info.plist */,
+				EA3F7BD41719D926001BD65B /* InfoPlist.strings */,
+				EA3F7BD71719D926001BD65B /* main.m */,
+				EA3F7BD91719D926001BD65B /* PebbleSimulator-Prefix.pch */,
+				EA3F7BDA1719D926001BD65B /* Credits.rtf */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		EA3F7BC71719D926001BD65B /* PebbleSimulator */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA3F7BE51719D926001BD65B /* Build configuration list for PBXNativeTarget "PebbleSimulator" */;
+			buildPhases = (
+				EA3F7BC41719D926001BD65B /* Sources */,
+				EA3F7BC51719D926001BD65B /* Frameworks */,
+				EA3F7BC61719D926001BD65B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PebbleSimulator;
+			productName = PebbleSimulator;
+			productReference = EA3F7BC81719D926001BD65B /* PebbleSimulator.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		EA3F7BC01719D926001BD65B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = SR;
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = "Steven van Rossum";
+			};
+			buildConfigurationList = EA3F7BC31719D926001BD65B /* Build configuration list for PBXProject "PebbleSimulator" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = EA3F7BBF1719D926001BD65B;
+			productRefGroup = EA3F7BC91719D926001BD65B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EA3F7BC71719D926001BD65B /* PebbleSimulator */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EA3F7BC61719D926001BD65B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA3F7BD61719D926001BD65B /* InfoPlist.strings in Resources */,
+				EA3F7BDC1719D926001BD65B /* Credits.rtf in Resources */,
+				EA3F7BE21719D926001BD65B /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EA3F7BC41719D926001BD65B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA3F7BD81719D926001BD65B /* main.m in Sources */,
+				EA3F7BDF1719D926001BD65B /* SRAppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		EA3F7BD41719D926001BD65B /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EA3F7BD51719D926001BD65B /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		EA3F7BDA1719D926001BD65B /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EA3F7BDB1719D926001BD65B /* en */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		EA3F7BE01719D926001BD65B /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EA3F7BE11719D926001BD65B /* en */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		EA3F7BE31719D926001BD65B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		EA3F7BE41719D926001BD65B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		EA3F7BE61719D926001BD65B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "PebbleSimulator/PebbleSimulator-Prefix.pch";
+				INFOPLIST_FILE = "PebbleSimulator/PebbleSimulator-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		EA3F7BE71719D926001BD65B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "PebbleSimulator/PebbleSimulator-Prefix.pch";
+				INFOPLIST_FILE = "PebbleSimulator/PebbleSimulator-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		EA3F7BC31719D926001BD65B /* Build configuration list for PBXProject "PebbleSimulator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA3F7BE31719D926001BD65B /* Debug */,
+				EA3F7BE41719D926001BD65B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EA3F7BE51719D926001BD65B /* Build configuration list for PBXNativeTarget "PebbleSimulator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA3F7BE61719D926001BD65B /* Debug */,
+				EA3F7BE71719D926001BD65B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = EA3F7BC01719D926001BD65B /* Project object */;
+}
