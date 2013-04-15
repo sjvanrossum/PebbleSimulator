@@ -21,6 +21,13 @@ The most interesting bit is that you aren't bound to Pebble's limitations. TAKE 
 
 I hope this Simulator will give developers the tools they need to rapidly iterate on Pebble Apps and Watch Faces.
 
+Portability
+===========
+
+Portability is low on my priority list at the moment.
+My original plan was to leverage the portability of libraries such as Qt and Cairo.
+I'll take a closer look at it after the initial release of Pebble Simulator, which will be Mac only for now.
+
 TODO
 ====
 
