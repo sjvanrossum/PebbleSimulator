@@ -13,7 +13,34 @@
 		EA3F7BDC1719D926001BD65B /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = EA3F7BDA1719D926001BD65B /* Credits.rtf */; };
 		EA3F7BDF1719D926001BD65B /* SRAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3F7BDE1719D926001BD65B /* SRAppDelegate.m */; };
 		EA3F7BE21719D926001BD65B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA3F7BE01719D926001BD65B /* MainMenu.xib */; };
+		EA3F7C14171ADE1D001BD65B /* SRPebbleSimView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3F7C13171ADE1D001BD65B /* SRPebbleSimView.m */; };
+		EA3F7C16171AE4DF001BD65B /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA3F7C15171AE4DF001BD65B /* CoreGraphics.framework */; };
+		EA3F7C19171B581F001BD65B /* SRPebbleWindowView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3F7C18171B581F001BD65B /* SRPebbleWindowView.m */; };
+		EA3F7C45171C1CED001BD65B /* pebble_os.c in Sources */ = {isa = PBXBuildFile; fileRef = EA3F7BE81719D94E001BD65B /* pebble_os.c */; };
+		EA3F7C47171C1CFA001BD65B /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA3F7C46171C1CFA001BD65B /* CoreFoundation.framework */; };
+		EA3F7C48171C1D03001BD65B /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA3F7C15171AE4DF001BD65B /* CoreGraphics.framework */; };
+		EA3F7C4B171C1D2E001BD65B /* libpebblesim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA3F7C3E171C1C2F001BD65B /* libpebblesim.a */; };
+		EA3F7C6D171C2319001BD65B /* pebble_app_info.h in Headers */ = {isa = PBXBuildFile; fileRef = EA3F7C6A171C2319001BD65B /* pebble_app_info.h */; };
+		EA3F7C6E171C2319001BD65B /* pebble_app.h in Headers */ = {isa = PBXBuildFile; fileRef = EA3F7C6B171C2319001BD65B /* pebble_app.h */; };
+		EA3F7C6F171C2319001BD65B /* pebble_fonts.h in Headers */ = {isa = PBXBuildFile; fileRef = EA3F7C6C171C2319001BD65B /* pebble_fonts.h */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		EA3F7C49171C1D21001BD65B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EA3F7BC01719D926001BD65B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA3F7C3D171C1C2F001BD65B;
+			remoteInfo = libpebblesim;
+		};
+		EA3F7C60171C1F22001BD65B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EA3F7C5C171C1F21001BD65B /* helloworld.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EA3F7C55171C1F21001BD65B;
+			remoteInfo = helloworld;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		EA3F7BC81719D926001BD65B /* PebbleSimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PebbleSimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -29,6 +56,20 @@
 		EA3F7BDD1719D926001BD65B /* SRAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRAppDelegate.h; sourceTree = "<group>"; };
 		EA3F7BDE1719D926001BD65B /* SRAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRAppDelegate.m; sourceTree = "<group>"; };
 		EA3F7BE11719D926001BD65B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		EA3F7BE81719D94E001BD65B /* pebble_os.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pebble_os.c; path = PebbleSimulator/pebble_os.c; sourceTree = "<group>"; };
+		EA3F7BEE1719D973001BD65B /* pebble_os.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = pebble_os.h; path = PebbleSimulator/pebble_os.h; sourceTree = "<group>"; };
+		EA3F7C10171A2561001BD65B /* pebble_sim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = pebble_sim.h; path = PebbleSimulator/pebble_sim.h; sourceTree = "<group>"; };
+		EA3F7C12171ADE1D001BD65B /* SRPebbleSimView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRPebbleSimView.h; sourceTree = "<group>"; };
+		EA3F7C13171ADE1D001BD65B /* SRPebbleSimView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRPebbleSimView.m; sourceTree = "<group>"; };
+		EA3F7C15171AE4DF001BD65B /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		EA3F7C17171B581F001BD65B /* SRPebbleWindowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRPebbleWindowView.h; sourceTree = "<group>"; };
+		EA3F7C18171B581F001BD65B /* SRPebbleWindowView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRPebbleWindowView.m; sourceTree = "<group>"; };
+		EA3F7C3E171C1C2F001BD65B /* libpebblesim.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpebblesim.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA3F7C46171C1CFA001BD65B /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		EA3F7C5C171C1F21001BD65B /* helloworld.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = helloworld.xcodeproj; path = helloworld/helloworld.xcodeproj; sourceTree = "<group>"; };
+		EA3F7C6A171C2319001BD65B /* pebble_app_info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pebble_app_info.h; sourceTree = "<group>"; };
+		EA3F7C6B171C2319001BD65B /* pebble_app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pebble_app.h; sourceTree = "<group>"; };
+		EA3F7C6C171C2319001BD65B /* pebble_fonts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pebble_fonts.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,7 +77,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA3F7C4B171C1D2E001BD65B /* libpebblesim.a in Frameworks */,
+				EA3F7C16171AE4DF001BD65B /* CoreGraphics.framework in Frameworks */,
 				EA3F7BCC1719D926001BD65B /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA3F7C3B171C1C2F001BD65B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA3F7C48171C1D03001BD65B /* CoreGraphics.framework in Frameworks */,
+				EA3F7C47171C1CFA001BD65B /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,6 +98,8 @@
 		EA3F7BBF1719D926001BD65B = {
 			isa = PBXGroup;
 			children = (
+				EA3F7C5C171C1F21001BD65B /* helloworld.xcodeproj */,
+				EA3F7C42171C1C57001BD65B /* pebblesim */,
 				EA3F7BD11719D926001BD65B /* PebbleSimulator */,
 				EA3F7BCA1719D926001BD65B /* Frameworks */,
 				EA3F7BC91719D926001BD65B /* Products */,
@@ -56,6 +110,7 @@
 			isa = PBXGroup;
 			children = (
 				EA3F7BC81719D926001BD65B /* PebbleSimulator.app */,
+				EA3F7C3E171C1C2F001BD65B /* libpebblesim.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -63,6 +118,8 @@
 		EA3F7BCA1719D926001BD65B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EA3F7C15171AE4DF001BD65B /* CoreGraphics.framework */,
+				EA3F7C46171C1CFA001BD65B /* CoreFoundation.framework */,
 				EA3F7BCB1719D926001BD65B /* Cocoa.framework */,
 				EA3F7BCD1719D926001BD65B /* Other Frameworks */,
 			);
@@ -82,6 +139,9 @@
 		EA3F7BD11719D926001BD65B /* PebbleSimulator */ = {
 			isa = PBXGroup;
 			children = (
+				EA3F7C11171A2566001BD65B /* Pebble Simulator Headers */,
+				EA3F7BEF1719D97F001BD65B /* Pebble Simulator Implementations */,
+				EA3F7BEA1719D95E001BD65B /* Pebble SDK Headers */,
 				EA3F7BDD1719D926001BD65B /* SRAppDelegate.h */,
 				EA3F7BDE1719D926001BD65B /* SRAppDelegate.m */,
 				EA3F7BE01719D926001BD65B /* MainMenu.xib */,
@@ -102,7 +162,82 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		EA3F7BEA1719D95E001BD65B /* Pebble SDK Headers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Pebble SDK Headers";
+			sourceTree = "<group>";
+		};
+		EA3F7BEF1719D97F001BD65B /* Pebble Simulator Implementations */ = {
+			isa = PBXGroup;
+			children = (
+				EA3F7C18171B581F001BD65B /* SRPebbleWindowView.m */,
+				EA3F7C13171ADE1D001BD65B /* SRPebbleSimView.m */,
+			);
+			name = "Pebble Simulator Implementations";
+			sourceTree = "<group>";
+		};
+		EA3F7C11171A2566001BD65B /* Pebble Simulator Headers */ = {
+			isa = PBXGroup;
+			children = (
+				EA3F7C17171B581F001BD65B /* SRPebbleWindowView.h */,
+				EA3F7C12171ADE1D001BD65B /* SRPebbleSimView.h */,
+			);
+			name = "Pebble Simulator Headers";
+			sourceTree = "<group>";
+		};
+		EA3F7C42171C1C57001BD65B /* pebblesim */ = {
+			isa = PBXGroup;
+			children = (
+				EA3F7C43171C1C7C001BD65B /* pebblesim Headers */,
+				EA3F7C44171C1CA4001BD65B /* pebblesim Implementations */,
+			);
+			name = pebblesim;
+			sourceTree = "<group>";
+		};
+		EA3F7C43171C1C7C001BD65B /* pebblesim Headers */ = {
+			isa = PBXGroup;
+			children = (
+				EA3F7C6A171C2319001BD65B /* pebble_app_info.h */,
+				EA3F7C6B171C2319001BD65B /* pebble_app.h */,
+				EA3F7C6C171C2319001BD65B /* pebble_fonts.h */,
+				EA3F7BEE1719D973001BD65B /* pebble_os.h */,
+				EA3F7C10171A2561001BD65B /* pebble_sim.h */,
+			);
+			name = "pebblesim Headers";
+			sourceTree = "<group>";
+		};
+		EA3F7C44171C1CA4001BD65B /* pebblesim Implementations */ = {
+			isa = PBXGroup;
+			children = (
+				EA3F7BE81719D94E001BD65B /* pebble_os.c */,
+			);
+			name = "pebblesim Implementations";
+			sourceTree = "<group>";
+		};
+		EA3F7C5D171C1F21001BD65B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EA3F7C61171C1F22001BD65B /* libhelloworld.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		EA3F7C3C171C1C2F001BD65B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA3F7C6D171C2319001BD65B /* pebble_app_info.h in Headers */,
+				EA3F7C6E171C2319001BD65B /* pebble_app.h in Headers */,
+				EA3F7C6F171C2319001BD65B /* pebble_fonts.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		EA3F7BC71719D926001BD65B /* PebbleSimulator */ = {
@@ -116,11 +251,29 @@
 			buildRules = (
 			);
 			dependencies = (
+				EA3F7C4A171C1D21001BD65B /* PBXTargetDependency */,
 			);
 			name = PebbleSimulator;
 			productName = PebbleSimulator;
 			productReference = EA3F7BC81719D926001BD65B /* PebbleSimulator.app */;
 			productType = "com.apple.product-type.application";
+		};
+		EA3F7C3D171C1C2F001BD65B /* pebblesim */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA3F7C41171C1C30001BD65B /* Build configuration list for PBXNativeTarget "pebblesim" */;
+			buildPhases = (
+				EA3F7C3A171C1C2F001BD65B /* Sources */,
+				EA3F7C3B171C1C2F001BD65B /* Frameworks */,
+				EA3F7C3C171C1C2F001BD65B /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = pebblesim;
+			productName = libpebblesim;
+			productReference = EA3F7C3E171C1C2F001BD65B /* libpebblesim.a */;
+			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
 
@@ -142,12 +295,29 @@
 			mainGroup = EA3F7BBF1719D926001BD65B;
 			productRefGroup = EA3F7BC91719D926001BD65B /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = EA3F7C5D171C1F21001BD65B /* Products */;
+					ProjectRef = EA3F7C5C171C1F21001BD65B /* helloworld.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				EA3F7BC71719D926001BD65B /* PebbleSimulator */,
+				EA3F7C3D171C1C2F001BD65B /* pebblesim */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		EA3F7C61171C1F22001BD65B /* libhelloworld.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libhelloworld.dylib;
+			remoteRef = EA3F7C60171C1F22001BD65B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		EA3F7BC61719D926001BD65B /* Resources */ = {
@@ -169,10 +339,28 @@
 			files = (
 				EA3F7BD81719D926001BD65B /* main.m in Sources */,
 				EA3F7BDF1719D926001BD65B /* SRAppDelegate.m in Sources */,
+				EA3F7C14171ADE1D001BD65B /* SRPebbleSimView.m in Sources */,
+				EA3F7C19171B581F001BD65B /* SRPebbleWindowView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA3F7C3A171C1C2F001BD65B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA3F7C45171C1CED001BD65B /* pebble_os.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		EA3F7C4A171C1D21001BD65B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA3F7C3D171C1C2F001BD65B /* pebblesim */;
+			targetProxy = EA3F7C49171C1D21001BD65B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		EA3F7BD41719D926001BD65B /* InfoPlist.strings */ = {
@@ -283,6 +471,22 @@
 			};
 			name = Release;
 		};
+		EA3F7C3F171C1C30001BD65B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		EA3F7C40171C1C30001BD65B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -300,6 +504,15 @@
 			buildConfigurations = (
 				EA3F7BE61719D926001BD65B /* Debug */,
 				EA3F7BE71719D926001BD65B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EA3F7C41171C1C30001BD65B /* Build configuration list for PBXNativeTarget "pebblesim" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA3F7C3F171C1C30001BD65B /* Debug */,
+				EA3F7C40171C1C30001BD65B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};
