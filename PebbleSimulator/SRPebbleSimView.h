@@ -23,6 +23,7 @@
 - (IBAction)upButtonClick:(id)sender;
 - (IBAction)selectButtonClick:(id)sender;
 - (IBAction)downButtonClick:(id)sender;
+- (void)awakePebbleApp;
 
 
 @property (assign) IBOutlet NSButton * upButton;

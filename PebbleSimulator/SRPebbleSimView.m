@@ -12,6 +12,16 @@
 #import <CoreGraphics/CoreGraphics.h>
 #include <dlfcn.h>
 
+void setAppHandlers(PebbleAppHandlers * handlers);
+CGContextRef getGraphicsContext(void);
+
+PebbleAppHandlers * appHandlers;
+
+CGContextRef graphicsContext;
+CFMutableArrayRef windowStack;
+
+SimulatorParams params;
+
 @implementation SRPebbleSimView
 
 - (id)initWithFrame:(NSRect)frame
@@ -34,26 +44,30 @@
 
 - (void)awakeFromNib
 {
+    [self performSelectorInBackground:@selector(awakePebbleApp) withObject:nil];
+}
+
+- (void)awakePebbleApp
+{
     dlhandle = dlopen("/Users/stev/Documents/XCode/PebbleSimulator/DerivedData/PebbleSimulator/Build/Products/Debug/libhelloworld.dylib", RTLD_NOW | RTLD_FIRST);
     pbl_main = dlsym(dlhandle, "pbl_main");
-    pbl_main(NULL);
+    params.getGraphicsContext = &getGraphicsContext;
+    params.setAppHandlers = &setAppHandlers;
+    pbl_main(&params);
 }
 
 - (void)setUpGState
 {
-    if (!gCtx.coreGraphicsContext)
+    if (!graphicsContext)
     {
-        gCtx.coreGraphicsContext = [[NSGraphicsContext currentContext] graphicsPort];
-        clear = CGColorCreateGenericRGB(0.0f, 0.0f, 0.0f, 0.0f);
-        black = CGColorCreateGenericRGB(0.0f, 0.0f, 0.0f, 1.0f);
-        white = CGColorCreateGenericRGB(1.0f, 1.0f, 1.0f, 1.0f);
-        CGContextSetFillColorWithColor(gCtx.coreGraphicsContext, black);
-        CGContextFillRect(gCtx.coreGraphicsContext, [self bounds]);
+        graphicsContext = [[NSGraphicsContext currentContext] graphicsPort];
     }
 }
 
 - (void)drawRect:(NSRect)dirtyRect
 {
+    //if (appHandlers && appHandlers->render_handler)
+    //    appHandlers->render_handler(NULL, NULL);
 }
 
 - (IBAction)upButtonClick:(id)sender
@@ -75,3 +89,17 @@
 }
 
 @end
+
+void setAppHandlers(PebbleAppHandlers * handlers)
+{
+    appHandlers = handlers;
+    handlers->init_handler((void*)&params);
+}
+
+CGContextRef getGraphicsContext(void)
+{
+    while (!graphicsContext)
+    {
+    }
+    return graphicsContext;
+}

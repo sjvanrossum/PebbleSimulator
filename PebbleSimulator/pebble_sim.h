@@ -20,11 +20,12 @@ struct GContext {
     CGContextRef coreGraphicsContext;
 };
 
-GContext gCtx;
-ClickConfig * cCfg[NUM_BUTTONS];
-
 void initOS(void);
 void deinitOS(void);
 
-
-typedef void (*pbl_main_impl)(void* params);
+typedef struct SimulatorParams
+{
+    CGContextRef (*getGraphicsContext)(void);
+    void (*setAppHandlers)(PebbleAppHandlers * handlers);
+    void (*setWindowStack)(CFMutableArrayRef windowStack);
+} SimulatorParams;

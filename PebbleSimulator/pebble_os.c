@@ -11,6 +11,9 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreGraphics/CoreGraphics.h>
 
+GContext gCtx;
+CFMutableArrayRef windowStack;
+
 void initOS(void)
 {
     // TODO: verify.
@@ -114,6 +117,9 @@ bool app_timer_cancel_event(AppContextRef app_ctx_ref, AppTimerHandle handle)
 void app_event_loop(AppTaskContextRef app_task_ctx, PebbleAppHandlers *handlers)
 {
     // TODO: figure it out, VERY IMPORTANT.
+    SimulatorParams * app_params = (SimulatorParams *)app_task_ctx;
+    gCtx.coreGraphicsContext = app_params->getGraphicsContext();
+    app_params->setAppHandlers(handlers);
 }
 
 bool bmp_init_container(int resource_id, BmpContainer *c)
