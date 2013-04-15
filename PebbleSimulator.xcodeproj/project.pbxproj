@@ -63,7 +63,7 @@
 		EA3F7BDD1719D926001BD65B /* SRAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRAppDelegate.h; sourceTree = "<group>"; };
 		EA3F7BDE1719D926001BD65B /* SRAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRAppDelegate.m; sourceTree = "<group>"; };
 		EA3F7BE11719D926001BD65B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		EA3F7BE81719D94E001BD65B /* pebble_os.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pebble_os.c; path = PebbleSimulator/pebble_os.c; sourceTree = "<group>"; };
+		EA3F7BE81719D94E001BD65B /* pebble_os.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pebble_os.c; sourceTree = "<group>"; };
 		EA3F7C12171ADE1D001BD65B /* SRPebbleSimView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRPebbleSimView.h; sourceTree = "<group>"; };
 		EA3F7C13171ADE1D001BD65B /* SRPebbleSimView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRPebbleSimView.m; sourceTree = "<group>"; };
 		EA3F7C15171AE4DF001BD65B /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
