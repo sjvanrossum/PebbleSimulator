@@ -25,7 +25,7 @@ void deinitOS(void);
 
 typedef struct SimulatorParams
 {
-    CGContextRef (*getGraphicsContext)(void);
+    void (*setGraphicsContext)(GContext * context);
     void (*setAppHandlers)(PebbleAppHandlers * handlers);
     void (*setWindowStack)(CFMutableArrayRef windowStack);
 } SimulatorParams;

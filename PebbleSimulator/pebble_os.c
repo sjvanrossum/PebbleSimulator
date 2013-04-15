@@ -11,12 +11,13 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreGraphics/CoreGraphics.h>
 
-GContext gCtx;
+GContext gCtx = (GContext) { NULL };
 CFMutableArrayRef windowStack;
 
 void initOS(void)
 {
     // TODO: verify.
+    
 }
 
 void deinitOS(void)
@@ -119,8 +120,12 @@ void app_event_loop(AppTaskContextRef app_task_ctx, PebbleAppHandlers *handlers)
     // TODO: verify.
     // VERY IMPORTANT.
     SimulatorParams * app_params = (SimulatorParams *)app_task_ctx;
-    gCtx.coreGraphicsContext = app_params->getGraphicsContext();
+    app_params->setGraphicsContext(&gCtx);
     app_params->setAppHandlers(handlers);
+    while (true)
+    {
+        
+    }
 }
 
 bool bmp_init_container(int resource_id, BmpContainer *c)
@@ -167,7 +172,7 @@ void graphics_context_set_stroke_color(GContext *ctx, GColor color)
             CGContextSetRGBStrokeColor(ctx->coreGraphicsContext, 0.0f, 0.0f, 0.0f, 1.0f);
             break;
         case GColorWhite:
-            CGContextSetRGBStrokeColor(ctx->coreGraphicsContext, 1.0f, 1.0f, 1.0f, 0.0f);
+            CGContextSetRGBStrokeColor(ctx->coreGraphicsContext, 1.0f, 1.0f, 1.0f, 1.0f);
             break;
         default:
             // Just do it, can't touch this.
@@ -187,7 +192,7 @@ void graphics_context_set_fill_color(GContext *ctx, GColor color)
             CGContextSetRGBFillColor(ctx->coreGraphicsContext, 0.0f, 0.0f, 0.0f, 1.0f);
             break;
         case GColorWhite:
-            CGContextSetRGBFillColor(ctx->coreGraphicsContext, 1.0f, 1.0f, 1.0f, 0.0f);
+            CGContextSetRGBFillColor(ctx->coreGraphicsContext, 1.0f, 1.0f, 1.0f, 1.0f);
             break;
         default:
             // Just do it, can't touch this.

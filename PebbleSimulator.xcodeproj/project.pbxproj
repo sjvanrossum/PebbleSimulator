@@ -42,6 +42,13 @@
 			remoteGlobalIDString = EA3F7C55171C1F21001BD65B;
 			remoteInfo = helloworld;
 		};
+		EA52DF2B171C70FE0037E25A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EA3F7C5C171C1F21001BD65B /* helloworld.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = EA3F7C54171C1F21001BD65B;
+			remoteInfo = helloworld;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -249,6 +256,7 @@
 			);
 			dependencies = (
 				EA3F7C4A171C1D21001BD65B /* PBXTargetDependency */,
+				EA52DF2C171C70FE0037E25A /* PBXTargetDependency */,
 			);
 			name = PebbleSimulator;
 			productName = PebbleSimulator;
@@ -356,6 +364,11 @@
 			isa = PBXTargetDependency;
 			target = EA3F7C3D171C1C2F001BD65B /* pebblesim */;
 			targetProxy = EA3F7C49171C1D21001BD65B /* PBXContainerItemProxy */;
+		};
+		EA52DF2C171C70FE0037E25A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = helloworld;
+			targetProxy = EA52DF2B171C70FE0037E25A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

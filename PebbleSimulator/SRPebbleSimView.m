@@ -13,11 +13,11 @@
 #include <dlfcn.h>
 
 void setAppHandlers(PebbleAppHandlers * handlers);
-CGContextRef getGraphicsContext(void);
+void setGraphicsContext(GContext * context);
 
-PebbleAppHandlers * appHandlers;
-
-CGContextRef graphicsContext;
+PebbleAppHandlers * appHandlers = NULL;
+GContext * ctx = NULL;
+CGContextRef graphicsContext = NULL;
 CFMutableArrayRef windowStack;
 
 SimulatorParams params;
@@ -36,9 +36,6 @@ SimulatorParams params;
 
 - (void)dealloc
 {
-    CGColorRelease(clear);
-    CGColorRelease(black);
-    CGColorRelease(white);
     [super dealloc];
 }
 
@@ -51,7 +48,7 @@ SimulatorParams params;
 {
     dlhandle = dlopen("/Users/stev/Documents/XCode/PebbleSimulator/DerivedData/PebbleSimulator/Build/Products/Debug/libhelloworld.dylib", RTLD_NOW | RTLD_FIRST);
     pbl_main = dlsym(dlhandle, "pbl_main");
-    params.getGraphicsContext = &getGraphicsContext;
+    params.setGraphicsContext = &setGraphicsContext;
     params.setAppHandlers = &setAppHandlers;
     pbl_main(&params);
 }
@@ -61,13 +58,15 @@ SimulatorParams params;
     if (!graphicsContext)
     {
         graphicsContext = [[NSGraphicsContext currentContext] graphicsPort];
+        CGContextSetRGBFillColor(graphicsContext, 0.0f, 0.0f, 0.0f, 1.0f);
+        CGContextFillRect(graphicsContext, [self bounds]);
     }
 }
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-    //if (appHandlers && appHandlers->render_handler)
-    //    appHandlers->render_handler(NULL, NULL);
+    if (graphicsContext && appHandlers && appHandlers->render_handler)
+        appHandlers->render_handler((void*)&params, &((PebbleRenderEvent) { .window = NULL, .ctx = ctx }));
 }
 
 - (IBAction)upButtonClick:(id)sender
@@ -93,13 +92,15 @@ SimulatorParams params;
 void setAppHandlers(PebbleAppHandlers * handlers)
 {
     appHandlers = handlers;
-    handlers->init_handler((void*)&params);
+    if (handlers->init_handler)
+        handlers->init_handler((void*)&params);
 }
 
-CGContextRef getGraphicsContext(void)
+void setGraphicsContext(GContext * context)
 {
     while (!graphicsContext)
     {
     }
-    return graphicsContext;
+    context->coreGraphicsContext = graphicsContext;
+    ctx = context;
 }
