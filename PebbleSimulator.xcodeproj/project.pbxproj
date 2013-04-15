@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EA3E3227171C28D800A0BD25 /* pebble_app_info.h in Headers */ = {isa = PBXBuildFile; fileRef = EA3E3222171C28D800A0BD25 /* pebble_app_info.h */; };
+		EA3E3228171C28D800A0BD25 /* pebble_app.h in Headers */ = {isa = PBXBuildFile; fileRef = EA3E3223171C28D800A0BD25 /* pebble_app.h */; };
+		EA3E3229171C28D800A0BD25 /* pebble_fonts.h in Headers */ = {isa = PBXBuildFile; fileRef = EA3E3224171C28D800A0BD25 /* pebble_fonts.h */; };
+		EA3E322A171C28D800A0BD25 /* pebble_os.h in Headers */ = {isa = PBXBuildFile; fileRef = EA3E3225171C28D800A0BD25 /* pebble_os.h */; };
+		EA3E322B171C28D800A0BD25 /* pebble_sim.h in Headers */ = {isa = PBXBuildFile; fileRef = EA3E3226171C28D800A0BD25 /* pebble_sim.h */; };
 		EA3F7BCC1719D926001BD65B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA3F7BCB1719D926001BD65B /* Cocoa.framework */; };
 		EA3F7BD61719D926001BD65B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EA3F7BD41719D926001BD65B /* InfoPlist.strings */; };
 		EA3F7BD81719D926001BD65B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3F7BD71719D926001BD65B /* main.m */; };
@@ -20,9 +25,6 @@
 		EA3F7C47171C1CFA001BD65B /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA3F7C46171C1CFA001BD65B /* CoreFoundation.framework */; };
 		EA3F7C48171C1D03001BD65B /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA3F7C15171AE4DF001BD65B /* CoreGraphics.framework */; };
 		EA3F7C4B171C1D2E001BD65B /* libpebblesim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA3F7C3E171C1C2F001BD65B /* libpebblesim.a */; };
-		EA3F7C6D171C2319001BD65B /* pebble_app_info.h in Headers */ = {isa = PBXBuildFile; fileRef = EA3F7C6A171C2319001BD65B /* pebble_app_info.h */; };
-		EA3F7C6E171C2319001BD65B /* pebble_app.h in Headers */ = {isa = PBXBuildFile; fileRef = EA3F7C6B171C2319001BD65B /* pebble_app.h */; };
-		EA3F7C6F171C2319001BD65B /* pebble_fonts.h in Headers */ = {isa = PBXBuildFile; fileRef = EA3F7C6C171C2319001BD65B /* pebble_fonts.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +45,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EA3E3222171C28D800A0BD25 /* pebble_app_info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pebble_app_info.h; sourceTree = "<group>"; };
+		EA3E3223171C28D800A0BD25 /* pebble_app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pebble_app.h; sourceTree = "<group>"; };
+		EA3E3224171C28D800A0BD25 /* pebble_fonts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pebble_fonts.h; sourceTree = "<group>"; };
+		EA3E3225171C28D800A0BD25 /* pebble_os.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pebble_os.h; sourceTree = "<group>"; };
+		EA3E3226171C28D800A0BD25 /* pebble_sim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pebble_sim.h; sourceTree = "<group>"; };
 		EA3F7BC81719D926001BD65B /* PebbleSimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PebbleSimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA3F7BCB1719D926001BD65B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		EA3F7BCE1719D926001BD65B /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -57,8 +64,6 @@
 		EA3F7BDE1719D926001BD65B /* SRAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRAppDelegate.m; sourceTree = "<group>"; };
 		EA3F7BE11719D926001BD65B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		EA3F7BE81719D94E001BD65B /* pebble_os.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pebble_os.c; path = PebbleSimulator/pebble_os.c; sourceTree = "<group>"; };
-		EA3F7BEE1719D973001BD65B /* pebble_os.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = pebble_os.h; path = PebbleSimulator/pebble_os.h; sourceTree = "<group>"; };
-		EA3F7C10171A2561001BD65B /* pebble_sim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = pebble_sim.h; path = PebbleSimulator/pebble_sim.h; sourceTree = "<group>"; };
 		EA3F7C12171ADE1D001BD65B /* SRPebbleSimView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRPebbleSimView.h; sourceTree = "<group>"; };
 		EA3F7C13171ADE1D001BD65B /* SRPebbleSimView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRPebbleSimView.m; sourceTree = "<group>"; };
 		EA3F7C15171AE4DF001BD65B /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -67,9 +72,6 @@
 		EA3F7C3E171C1C2F001BD65B /* libpebblesim.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpebblesim.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA3F7C46171C1CFA001BD65B /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		EA3F7C5C171C1F21001BD65B /* helloworld.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = helloworld.xcodeproj; path = helloworld/helloworld.xcodeproj; sourceTree = "<group>"; };
-		EA3F7C6A171C2319001BD65B /* pebble_app_info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pebble_app_info.h; sourceTree = "<group>"; };
-		EA3F7C6B171C2319001BD65B /* pebble_app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pebble_app.h; sourceTree = "<group>"; };
-		EA3F7C6C171C2319001BD65B /* pebble_fonts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pebble_fonts.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,7 +143,6 @@
 			children = (
 				EA3F7C11171A2566001BD65B /* Pebble Simulator Headers */,
 				EA3F7BEF1719D97F001BD65B /* Pebble Simulator Implementations */,
-				EA3F7BEA1719D95E001BD65B /* Pebble SDK Headers */,
 				EA3F7BDD1719D926001BD65B /* SRAppDelegate.h */,
 				EA3F7BDE1719D926001BD65B /* SRAppDelegate.m */,
 				EA3F7BE01719D926001BD65B /* MainMenu.xib */,
@@ -160,13 +161,6 @@
 				EA3F7BDA1719D926001BD65B /* Credits.rtf */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		EA3F7BEA1719D95E001BD65B /* Pebble SDK Headers */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "Pebble SDK Headers";
 			sourceTree = "<group>";
 		};
 		EA3F7BEF1719D97F001BD65B /* Pebble Simulator Implementations */ = {
@@ -194,16 +188,17 @@
 				EA3F7C44171C1CA4001BD65B /* pebblesim Implementations */,
 			);
 			name = pebblesim;
+			path = PebbleSimulator;
 			sourceTree = "<group>";
 		};
 		EA3F7C43171C1C7C001BD65B /* pebblesim Headers */ = {
 			isa = PBXGroup;
 			children = (
-				EA3F7C6A171C2319001BD65B /* pebble_app_info.h */,
-				EA3F7C6B171C2319001BD65B /* pebble_app.h */,
-				EA3F7C6C171C2319001BD65B /* pebble_fonts.h */,
-				EA3F7BEE1719D973001BD65B /* pebble_os.h */,
-				EA3F7C10171A2561001BD65B /* pebble_sim.h */,
+				EA3E3223171C28D800A0BD25 /* pebble_app.h */,
+				EA3E3222171C28D800A0BD25 /* pebble_app_info.h */,
+				EA3E3224171C28D800A0BD25 /* pebble_fonts.h */,
+				EA3E3225171C28D800A0BD25 /* pebble_os.h */,
+				EA3E3226171C28D800A0BD25 /* pebble_sim.h */,
 			);
 			name = "pebblesim Headers";
 			sourceTree = "<group>";
@@ -231,9 +226,11 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EA3F7C6D171C2319001BD65B /* pebble_app_info.h in Headers */,
-				EA3F7C6E171C2319001BD65B /* pebble_app.h in Headers */,
-				EA3F7C6F171C2319001BD65B /* pebble_fonts.h in Headers */,
+				EA3E3227171C28D800A0BD25 /* pebble_app_info.h in Headers */,
+				EA3E3228171C28D800A0BD25 /* pebble_app.h in Headers */,
+				EA3E3229171C28D800A0BD25 /* pebble_fonts.h in Headers */,
+				EA3E322A171C28D800A0BD25 /* pebble_os.h in Headers */,
+				EA3E322B171C28D800A0BD25 /* pebble_sim.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -515,6 +512,7 @@
 				EA3F7C40171C1C30001BD65B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
