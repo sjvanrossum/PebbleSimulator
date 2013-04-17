@@ -162,7 +162,7 @@ void fonts_unload_custom_font(GFont font)
 
 void graphics_context_set_stroke_color(GContext *ctx, GColor color)
 {
-    // TODO: figure it out.
+    // TODO: verify.
     switch (color)
     {
         case GColorClear:
