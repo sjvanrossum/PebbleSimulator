@@ -5,25 +5,25 @@
 //  Created by Steven van Rossum on 13-04-13.
 //  Copyright (c) 2013 Steven van Rossum. All rights reserved.
 //
+//  Notes:
+//  - Graphics routines currently implemented using Mac-native graphics routines (Core Graphics), non-portable.
+//    Considering Cairo as a replacement.
+//  - Other core structures currently implemented using Mac-native structures (Core Foundation), portable to other platforms.
+//    Considering standard C and POSIX or C++11 core structures.
+//  - 
 
 #include "pebble_os.h"
 #include "pebble_sim.h"
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreGraphics/CoreGraphics.h>
 
+PblTm pblNow;
+
 GContext gCtx = (GContext) { NULL };
 CFMutableArrayRef windowStack;
+CFTimeZoneRef startupTimeZone;
 
-void initOS(void)
-{
-    // TODO: verify.
-    
-}
-
-void deinitOS(void)
-{
-    // TODO: verify.
-}
+void app_callback_loop(CFRunLoopTimerRef timer, void * info);
 
 void animation_init(struct Animation *animation)
 {
@@ -115,17 +115,58 @@ bool app_timer_cancel_event(AppContextRef app_ctx_ref, AppTimerHandle handle)
     // TODO: figure it out.
 }
 
+void app_callback_loop(CFRunLoopTimerRef timer, void * info)
+{
+    SimulatorParams * app_task_ctx = (SimulatorParams *)info;
+    PebbleAppHandlers * handlers = app_task_ctx->handlers;
+    
+    PblTm itmPblNow;
+    get_time(&itmPblNow);
+    if (handlers->tick_info.tick_handler)
+    {
+        TimeUnits flags = handlers->tick_info.tick_units;
+        TimeUnits units_changed = 0;
+        if (flags & YEAR_UNIT && itmPblNow.tm_year != pblNow.tm_year)
+            units_changed |= YEAR_UNIT;
+        if (flags & MONTH_UNIT && itmPblNow.tm_mon != pblNow.tm_mon)
+            units_changed |= MONTH_UNIT;
+        if (flags & DAY_UNIT && itmPblNow.tm_mday != pblNow.tm_mday)
+            units_changed |= DAY_UNIT;
+        if (flags & HOUR_UNIT && itmPblNow.tm_hour != pblNow.tm_hour)
+            units_changed |= HOUR_UNIT;
+        if (flags & MINUTE_UNIT && itmPblNow.tm_min != pblNow.tm_min)
+            units_changed |= MINUTE_UNIT;
+        if (flags & SECOND_UNIT && itmPblNow.tm_sec != pblNow.tm_sec)
+            units_changed |= SECOND_UNIT;
+        
+        if (units_changed != 0)
+            handlers->tick_info.tick_handler(app_task_ctx, &((PebbleTickEvent) { .tick_time = &itmPblNow, .units_changed = units_changed }));
+    }
+    pblNow = itmPblNow;
+}
+
 void app_event_loop(AppTaskContextRef app_task_ctx, PebbleAppHandlers *handlers)
 {
     // TODO: verify.
     // VERY IMPORTANT.
     SimulatorParams * app_params = (SimulatorParams *)app_task_ctx;
+    startupTimeZone = CFTimeZoneCopySystem();
     app_params->setGraphicsContext(&gCtx);
     app_params->setAppHandlers(handlers);
-    while (true)
-    {
-        
-    }
+    app_params->handlers = handlers;
+    if (handlers->init_handler)
+        handlers->init_handler(app_task_ctx);
+    get_time(&pblNow);
+    CFRunLoopTimerRef timer = CFRunLoopTimerCreate(kCFAllocatorDefault, CFAbsoluteTimeGetCurrent(), 1.0/1000.0, 0, 0, &app_callback_loop, &((CFRunLoopTimerContext){ .info = app_params }));
+    CFRunLoopRef rlCur = CFRunLoopGetCurrent();
+    CFRunLoopAddTimer(rlCur, timer, kCFRunLoopDefaultMode);
+    CFRunLoopRun();
+    
+    
+    CFRelease(timer);
+    CFRelease(startupTimeZone);
+    if (handlers->deinit_handler)
+        handlers->deinit_handler(app_task_ctx);
 }
 
 bool bmp_init_container(int resource_id, BmpContainer *c)
@@ -282,25 +323,21 @@ void graphics_draw_round_rect(GContext *ctx, GRect rect, int radius)
 void get_time(PblTm *time)
 {
     // TODO: verify.
-    //NSDate * now = [NSDate date];
-    
-    //CFGregorianDate date
-    
-    //NSUInteger componentsFlags = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit | NSWeekdayCalendarUnit | NSWeekOfYearCalendarUnit;
-    //NSDateComponents * components = [gregorian components:componentsFlags fromDate:now];
-    /*
+    CFAbsoluteTime itmNow = CFAbsoluteTimeGetCurrent();
+    CFGregorianDate itmGreg = CFAbsoluteTimeGetGregorianDate(itmNow, startupTimeZone);
+
     *time = (PblTm)
     {
-        .tm_sec = (int)[components second],
-        .tm_min = (int)[components minute],
-        .tm_hour = (int)[components hour],
-        .tm_mday = (int)[components day],
-        .tm_mon = (int)[components month],
-        .tm_year = (int)[components year],
-        .tm_wday = (int)[components weekday],
-        .tm_yday = (int)[gregorian ordinalityOfUnit:NSDayCalendarUnit inUnit:NSYearCalendarUnit forDate:now],
-        .tm_isdst = (int)[[NSTimeZone systemTimeZone] isDaylightSavingTime]
-    };*/
+        .tm_sec = (int)itmGreg.second,
+        .tm_min = (int)itmGreg.minute,
+        .tm_hour = (int)itmGreg.hour,
+        .tm_mday = (int)itmGreg.day,
+        .tm_mon = (int)itmGreg.month,
+        .tm_year = (int)itmGreg.year,
+        .tm_wday = (int)CFAbsoluteTimeGetDayOfWeek(itmNow, startupTimeZone),
+        .tm_yday = (int)CFAbsoluteTimeGetDayOfYear(itmNow, startupTimeZone),
+        .tm_isdst = (int)CFTimeZoneIsDaylightSavingTime(startupTimeZone, itmNow)
+    };
 }
 
 void gpath_init(GPath *path, const GPathInfo *init)
@@ -739,7 +776,8 @@ GContext *app_get_current_graphics_context(void)
 
 bool clock_is_24h_style(void)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    return true;
 }
 
 void property_animation_init_layer_frame(struct PropertyAnimation *property_animation, struct Layer *layer, GRect *from_frame, GRect *to_frame)

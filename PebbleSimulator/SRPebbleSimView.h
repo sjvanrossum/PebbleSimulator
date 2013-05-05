@@ -20,6 +20,9 @@
     void (*pbl_main)(void * params);
 }
 
+void setAppHandlers(PebbleAppHandlers * handlers);
+void setGraphicsContext(GContext * context);
+
 - (IBAction)upButtonClick:(id)sender;
 - (IBAction)selectButtonClick:(id)sender;
 - (IBAction)downButtonClick:(id)sender;

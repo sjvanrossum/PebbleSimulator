@@ -20,12 +20,10 @@ struct GContext {
     CGContextRef coreGraphicsContext;
 };
 
-void initOS(void);
-void deinitOS(void);
-
 typedef struct SimulatorParams
 {
     void (*setGraphicsContext)(GContext * context);
     void (*setAppHandlers)(PebbleAppHandlers * handlers);
     void (*setWindowStack)(CFMutableArrayRef windowStack);
+    PebbleAppHandlers * handlers;
 } SimulatorParams;

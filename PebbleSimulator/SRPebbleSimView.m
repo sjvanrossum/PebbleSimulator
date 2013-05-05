@@ -12,8 +12,7 @@
 #import <CoreGraphics/CoreGraphics.h>
 #include <dlfcn.h>
 
-void setAppHandlers(PebbleAppHandlers * handlers);
-void setGraphicsContext(GContext * context);
+@implementation SRPebbleSimView
 
 PebbleAppHandlers * appHandlers = NULL;
 GContext * ctx = NULL;
@@ -22,7 +21,72 @@ CFMutableArrayRef windowStack;
 
 SimulatorParams params;
 
-@implementation SRPebbleSimView
+void setAppHandlers(PebbleAppHandlers * handlers)
+{
+    appHandlers = handlers;
+    // timer handler
+    if (handlers->timer_handler)
+    {
+        
+    }
+    // tick info
+    // tick handler
+    if (handlers->tick_info.tick_handler)
+    {
+        
+    }
+    // input handlers
+    // down
+    if (handlers->input_handlers.buttons.down)
+    {
+        
+    }
+    // up
+    if (handlers->input_handlers.buttons.up)
+    {
+        
+    }
+    // messaging info
+    // in dropped
+    if (handlers->messaging_info.default_callbacks.callbacks.in_dropped)
+    {
+        
+    }
+    // in received
+    if (handlers->messaging_info.default_callbacks.callbacks.in_received)
+    {
+        
+    }
+    // out failed
+    if (handlers->messaging_info.default_callbacks.callbacks.out_failed)
+    {
+        
+    }
+    // out sent
+    if (handlers->messaging_info.default_callbacks.callbacks.out_sent)
+    {
+        
+    }
+    // deinit handler
+    if (handlers->deinit_handler)
+    {
+        
+    }
+    // init handler
+    if (handlers->init_handler)
+    {
+        handlers->init_handler((void*)&params);
+    }
+}
+
+void setGraphicsContext(GContext * context)
+{
+    while (!graphicsContext)
+    {
+    }
+    context->coreGraphicsContext = graphicsContext;
+    ctx = context;
+}
 
 - (id)initWithFrame:(NSRect)frame
 {
@@ -88,19 +152,3 @@ SimulatorParams params;
 }
 
 @end
-
-void setAppHandlers(PebbleAppHandlers * handlers)
-{
-    appHandlers = handlers;
-    if (handlers->init_handler)
-        handlers->init_handler((void*)&params);
-}
-
-void setGraphicsContext(GContext * context)
-{
-    while (!graphicsContext)
-    {
-    }
-    context->coreGraphicsContext = graphicsContext;
-    ctx = context;
-}
