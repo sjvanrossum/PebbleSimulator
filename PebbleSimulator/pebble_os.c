@@ -21,8 +21,10 @@ PblTm pblNow;
 
 GContext gCtx = (GContext) { NULL };
 CFMutableArrayRef windowStack;
+CFMutableDictionaryRef appTimers;
 CFTimeZoneRef startupTimeZone;
 
+void app_timer_applier(const void *key, const void *value, void *context);
 void app_callback_loop(CFRunLoopTimerRef timer, void * info);
 
 void animation_init(struct Animation *animation)
@@ -107,18 +109,52 @@ bool animation_is_scheduled(struct Animation *animation)
 
 AppTimerHandle app_timer_send_event(AppContextRef app_ctx, uint32_t timeout_ms, uint32_t cookie)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    CFNumberRef key = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &cookie);
+    CFNumberRef value = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &timeout_ms);
+    CFDictionaryAddValue(appTimers, key, value);
+    CFRelease(key);
+    CFRelease(value);
+    return cookie;
 }
 
 bool app_timer_cancel_event(AppContextRef app_ctx_ref, AppTimerHandle handle)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    CFNumberRef key = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &handle);
+    bool exists = CFDictionaryContainsValue(appTimers, key);
+    if (exists)
+        CFDictionaryRemoveValue(appTimers, key);
+    CFRelease(key);
+    return exists;
+}
+
+void app_timer_applier(const void *key, const void *value, void *context)
+{
+    CFNumberRef val = (CFNumberRef)value;
+    uint32_t baseVal;
+    CFNumberGetValue(val, kCFNumberIntType, &baseVal);
+    --baseVal;
+    CFDictionaryReplaceValue(appTimers, key, CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &(baseVal)));
+    if (baseVal == 0)
+    {
+        uint32_t cookie;
+        CFNumberGetValue(key, kCFNumberIntType, &cookie);
+        (((SimulatorParams *)context)->handlers->timer_handler)(context, cookie, cookie);
+        CFDictionaryRemoveValue(appTimers, key);
+    }
 }
 
 void app_callback_loop(CFRunLoopTimerRef timer, void * info)
 {
+    // TODO: verify.
     SimulatorParams * app_task_ctx = (SimulatorParams *)info;
     PebbleAppHandlers * handlers = app_task_ctx->handlers;
+    
+    if (handlers->timer_handler)
+    {
+        CFDictionaryApplyFunction(appTimers, &app_timer_applier, app_task_ctx);
+    }
     
     PblTm itmPblNow;
     get_time(&itmPblNow);
@@ -152,21 +188,24 @@ void app_event_loop(AppTaskContextRef app_task_ctx, PebbleAppHandlers *handlers)
     SimulatorParams * app_params = (SimulatorParams *)app_task_ctx;
     startupTimeZone = CFTimeZoneCopySystem();
     app_params->setGraphicsContext(&gCtx);
-    app_params->setAppHandlers(handlers);
     app_params->handlers = handlers;
-    if (handlers->init_handler)
-        handlers->init_handler(app_task_ctx);
+    
+    appTimers = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
+    
     get_time(&pblNow);
     CFRunLoopTimerRef timer = CFRunLoopTimerCreate(kCFAllocatorDefault, CFAbsoluteTimeGetCurrent(), 1.0/1000.0, 0, 0, &app_callback_loop, &((CFRunLoopTimerContext){ .info = app_params }));
-    CFRunLoopRef rlCur = CFRunLoopGetCurrent();
-    CFRunLoopAddTimer(rlCur, timer, kCFRunLoopDefaultMode);
+    CFRunLoopAddTimer(CFRunLoopGetCurrent(), timer, kCFRunLoopDefaultMode);
+    
+    if (handlers->init_handler)
+        handlers->init_handler(app_task_ctx);
+    
     CFRunLoopRun();
     
+    if (handlers->deinit_handler)
+        handlers->deinit_handler(app_task_ctx);
     
     CFRelease(timer);
     CFRelease(startupTimeZone);
-    if (handlers->deinit_handler)
-        handlers->deinit_handler(app_task_ctx);
 }
 
 bool bmp_init_container(int resource_id, BmpContainer *c)

@@ -75,7 +75,7 @@ void setAppHandlers(PebbleAppHandlers * handlers)
     // init handler
     if (handlers->init_handler)
     {
-        handlers->init_handler((void*)&params);
+        
     }
 }
 
