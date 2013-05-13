@@ -3,12 +3,6 @@ PebbleSimulator
 
 Pebble Simulator and support libraries for Mac.
 
-Structure
-=========
-
-Ha! You wish it were structured...
-Seriously though, I'm trying my best to structure files, but I can't guarantee any structure at this point.
-
 Vision
 ======
 
@@ -30,6 +24,10 @@ I'll take a closer look at it after the initial release of Pebble Simulator, whi
 
 TODO
 ====
+
+- Implement custom graphics backend, because Core Graphics doesn't support various filter modes supplied by Pebble.
+- Implement Animations.
+- Implement various other features, e.g. resolve remaining ~100 "figure it out." annotated functions.
 
 You will find each of the pebble_os.c functions annotated with one of the following
 
