@@ -1106,7 +1106,7 @@ GSize scroll_layer_get_content_size(ScrollLayer *scroll_layer)
 void scroll_layer_set_frame(ScrollLayer *scroll_layer, GRect frame)
 {
     // TODO: figure it out.
-    layer_set_frame(&scroll_layer->layer, rect);
+    layer_set_frame(&scroll_layer->layer, frame);
 }
 
 void scroll_layer_scroll_up_click_handler(ClickRecognizerRef recognizer, ScrollLayer *scroll_layer)
