@@ -2,6 +2,31 @@
 
 #include <stdint.h>
 
+//! @addtogroup Foundation
+//! @{
+//!   @addtogroup App
+//!   @{
+
+//! Application metadata flags.
+//! Flags can be combined using the `|` operator.
+//! @see PBL_APP_INFO
+typedef enum {
+  //! Use to indicate the application is not a watchface, but a "standard" app.
+  //! The system will show the app in the main menu.
+  APP_INFO_STANDARD_APP = 0,
+  //! Use to indicate the application is a watchface.
+  //! The system will show the app in the watchfaces menu.
+  APP_INFO_WATCH_FACE = 1 << 0,
+  //! Use to hide the application.
+  APP_INFO_VISIBILITY_HIDDEN = 1 << 1,
+  //! Use to hide the application, unless there is ongoing communication with
+  //! the companion smartphone application.
+  APP_INFO_VISIBILITY_SHOWN_ON_COMMUNICATION = 1 << 2,
+} PebbleAppFlags;
+
+//!   @} // group App
+//! @} // group Foundation
+
 // struct PebbleAppInfo change log
 // ================================
 // struct_version (little endian):
@@ -15,13 +40,7 @@
 #define APP_NAME_BYTES 32
 #define COMPANY_NAME_BYTES 32
 
-typedef enum {
-  APP_INFO_STANDARD_APP = 0,
-  APP_INFO_WATCH_FACE = 1 << 0,
-  APP_INFO_VISIBILITY_HIDDEN = 1 << 1,
-  APP_INFO_VISIBILITY_SHOWN_ON_COMMUNICATION = 1 << 2,
-} PebbleAppFlags;
-
+//! @internal
 //! Version data structure with minor & major versions: When making non-backwards-compatible changes,
 //! the major version should get bumped. When making a change (e.g. to the PebbleAppInfo struct) that is backwards
 //! compatible (e.g. adding a field at the end), you should only bump the minor version.
@@ -30,6 +49,7 @@ typedef struct __attribute__((__packed__)) {
   uint8_t minor;
 } Version;
 
+//! @internal
 // WARNING: changes in this struct must be reflected in:
 // - tintin/waftools/inject_metadata.py
 // - iOS/PebblePrivateKit/PebblePrivateKit/PBBundle.m

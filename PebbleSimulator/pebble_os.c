@@ -536,6 +536,8 @@ void light_enable_interaction(void)
 
 void psleep(int millis)
 {
+    if (millis > 0)
+        usleep((useconds_t)millis);
     // TODO: figure it out.
 }
 
@@ -789,22 +791,29 @@ void text_layer_set_background_color(TextLayer *text_layer, GColor color)
 
 void vibes_double_pulse(void)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    printf("Double vibe.\n");
 }
 
 void vibes_enqueue_custom_pattern(VibePattern pattern)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    for (int i = 0; i < pattern.num_segments; i++)
+    {
+        printf("%i vibe.\n", pattern.durations[i]);
+    }
 }
 
 void vibes_long_pulse(void)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    printf("Long vibe.\n");
 }
 
 void vibes_short_pulse(void)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    printf("Short vibe.\n");
 }
 
 GContext *app_get_current_graphics_context(void)
@@ -933,33 +942,33 @@ void inverter_layer_init(InverterLayer *inverter, GRect frame)
     // TODO: malloc/init.
 }
 
-void bitmap_layer_init(BitmapLayer *image, GRect frame)
+void bitmap_layer_init(BitmapLayer *bitmap_layer, GRect frame)
 {
     // TODO: malloc/init.
 }
 
-void bitmap_layer_set_bitmap(BitmapLayer *image, const GBitmap *bitmap)
+void bitmap_layer_set_bitmap(BitmapLayer *bitmap_layer, const GBitmap *bitmap)
 {
     // TODO: verify.
-    image->bitmap = bitmap;
+    bitmap_layer->bitmap = bitmap;
 }
 
-void bitmap_layer_set_alignment(BitmapLayer *image, GAlign alignment)
+void bitmap_layer_set_alignment(BitmapLayer *bitmap_layer, GAlign alignment)
 {
     // TODO: verify.
-    image->alignment = alignment;
+    bitmap_layer->alignment = alignment;
 }
 
-void bitmap_layer_set_background_color(BitmapLayer *image, GColor color)
+void bitmap_layer_set_background_color(BitmapLayer *bitmap_layer, GColor color)
 {
     // TODO: verify.
-    image->background_color = color;
+    bitmap_layer->background_color = color;
 }
 
-void bitmap_layer_set_compositing_mode(BitmapLayer *image, GCompOp mode)
+void bitmap_layer_set_compositing_mode(BitmapLayer *bitmap_layer, GCompOp mode)
 {
     // TODO: verify.
-    image->compositing_mode = mode;
+    bitmap_layer->compositing_mode = mode;
 }
 
 bool heap_bitmap_init(HeapBitmap *hb, int resource_id)
@@ -982,17 +991,17 @@ uint8_t click_number_of_clicks_counted(ClickRecognizerRef recognizer)
     // TODO: figure it out.
 }
 
-void menu_cell_basic_draw(GContext *ctx, Layer *cell_layer, const char *title, const char *subtitle, GBitmap *icon)
+void menu_cell_basic_draw(GContext *ctx, const Layer *cell_layer, const char *title, const char *subtitle, GBitmap *icon)
 {
     // TODO: figure it out.
 }
 
-void menu_cell_title_draw(GContext *ctx, Layer *cell_layer, const char *title)
+void menu_cell_title_draw(GContext *ctx, const Layer *cell_layer, const char *title)
 {
     // TODO: figure it out.
 }
 
-void menu_cell_basic_header_draw(GContext *ctx, Layer *cell_layer, const char *title)
+void menu_cell_basic_header_draw(GContext *ctx, const Layer *cell_layer, const char *title)
 {
     // TODO: figure it out.
 }
@@ -1094,7 +1103,7 @@ GSize scroll_layer_get_content_size(ScrollLayer *scroll_layer)
     return scroll_layer->content_sublayer.frame.size;
 }
 
-void scroll_layer_set_frame(ScrollLayer *scroll_layer, GRect rect)
+void scroll_layer_set_frame(ScrollLayer *scroll_layer, GRect frame)
 {
     // TODO: figure it out.
     layer_set_frame(&scroll_layer->layer, rect);
@@ -1266,22 +1275,22 @@ AppMessageResult app_message_out_release(void)
     // TODO: figure it out.
 }
 
-void app_sync_init(AppSync *s, uint8_t *buffer, const uint16_t buffer_size, const Tuplet * const keys_and_initial_values, const uint8_t count, AppSyncTupleChangedCallback tuple_changed_callback, AppSyncErrorCallback error_callback, void *context)
+void app_sync_init(struct AppSync *s, uint8_t *buffer, const uint16_t buffer_size, const Tuplet * const keys_and_initial_values, const uint8_t count, AppSyncTupleChangedCallback tuple_changed_callback, AppSyncErrorCallback error_callback, void *context)
 {
     // TODO: malloc/init.
 }
 
-void app_sync_deinit(AppSync *s)
+void app_sync_deinit(struct AppSync *s)
 {
     // TODO: free.
 }
 
-AppMessageResult app_sync_set(AppSync *s, const Tuplet * const keys_and_values_to_update, const uint8_t count)
+AppMessageResult app_sync_set(struct AppSync *s, const Tuplet * const keys_and_values_to_update, const uint8_t count)
 {
     // TODO: figure it out.
 }
 
-const Tuple *app_sync_get(const AppSync *s, const uint32_t key)
+const Tuple *app_sync_get(const struct AppSync *s, const uint32_t key)
 {
     // TODO: verify.
     return dict_find(&s->current_iter, key);
@@ -1474,10 +1483,10 @@ void number_window_init(NumberWindow *numberwindow, const char *label, NumberWin
     numberwindow->callback_context = callback_context;
 }
 
-void number_window_set_label(NumberWindow *nw, const char *label)
+void number_window_set_label(NumberWindow *numberwindow, const char *label)
 {
     // TODO: verify.
-    nw->value_label.text = label;
+    numberwindow->value_label.text = label;
 }
 
 void number_window_set_max(NumberWindow *numberwindow, int max)

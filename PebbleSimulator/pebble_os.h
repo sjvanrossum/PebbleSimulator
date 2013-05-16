@@ -16,16 +16,8 @@ struct MenuLayer;
 struct NumberWindow;
 struct GContext;
 typedef struct GContext GContext;
-#define GPoint(x, y) ((GPoint){(x), (y)})
-#define GPointZero GPoint(0, 0)
-#define GSize(w, h) ((GSize){(w), (h)})
-#define GSizeZero GSize(0, 0)
-#define GRect(x, y, w, h) ((GRect){{(x), (y)}, {(w), (h)}})
-#define GRectZero GRect(0, 0, 0, 0)
-#define TRIG_MAX_RATIO 0xffff
-#define TRIG_MAX_ANGLE 0x10000 // corresponds to 360 degrees
-#define ANIMATION_NORMALIZED_MIN 0
-#define ANIMATION_NORMALIZED_MAX 65535
+struct TextLayout;
+typedef struct TextLayout TextLayout;
 #define ARRAY_LENGTH(array) (sizeof((array))/sizeof((array)[0]))
 #define IS_SIGNED(var) (((__typeof__(var)) - 1) < 0)
 #define TupletBytes(_key, _data, _length) \
@@ -34,6 +26,16 @@ typedef struct GContext GContext;
 ((const Tuplet) { .type = TUPLE_CSTRING, .key = _key, .cstring = { .data = _cstring, .length = _cstring ? strlen(_cstring) + 1 : 0 }})
 #define TupletInteger(_key, _integer) \
 ((const Tuplet) { .type = IS_SIGNED(_integer) ? TUPLE_INT : TUPLE_UINT, .key = _key, .integer = { .storage = _integer, .width = sizeof(_integer) }})
+#define GPoint(x, y) ((GPoint){(x), (y)})
+#define GPointZero GPoint(0, 0)
+#define GSize(w, h) ((GSize){(w), (h)})
+#define GSizeZero GSize(0, 0)
+#define GRect(x, y, w, h) ((GRect){{(x), (y)}, {(w), (h)}})
+#define GRectZero GRect(0, 0, 0, 0)
+#define TRIG_MAX_RATIO 0xffff
+#define TRIG_MAX_ANGLE 0x10000
+#define ANIMATION_NORMALIZED_MIN 0
+#define ANIMATION_NORMALIZED_MAX 65535
 
 typedef struct AccelData
 {
@@ -114,7 +116,7 @@ typedef struct GBitmap
   GRect bounds;
 } GBitmap;
 typedef enum {GCompOpAssign, GCompOpAssignInverted, GCompOpOr, GCompOpAnd, GCompOpClear} GCompOp;
-typedef struct GDrawState
+typedef struct 
 {
   GRect clip_box;
   GRect drawing_box;
@@ -141,7 +143,7 @@ typedef enum {SECOND_UNIT = 1 << 0, MINUTE_UNIT = 1 << 1, HOUR_UNIT = 1 << 2, DA
 typedef void *ClickRecognizerRef;
 typedef void (*ClickHandler)(ClickRecognizerRef recognizer, void *context);
 typedef enum {TUPLE_BYTE_ARRAY = 0, TUPLE_CSTRING = 1, TUPLE_UINT = 2, TUPLE_INT = 3} TupleType;
-typedef struct 
+typedef struct __attribute__((__packed__))
 {
   uint32_t key;
   TupleType type : 8;
@@ -181,7 +183,7 @@ typedef struct Tuplet
     } integer;
   };
 } Tuplet;
-typedef struct 
+typedef struct __attribute__((__packed__))
 {
   uint8_t count;
   Tuple head[];
@@ -193,21 +195,22 @@ typedef struct
   Tuple *cursor;
 } DictionaryIterator;
 typedef enum {APP_MSG_OK = 0, APP_MSG_SEND_TIMEOUT = 1 << 1, APP_MSG_SEND_REJECTED = 1 << 2, APP_MSG_NOT_CONNECTED = 1 << 3, APP_MSG_APP_NOT_RUNNING = 1 << 4, APP_MSG_INVALID_ARGS = 1 << 5, APP_MSG_BUSY = 1 << 6, APP_MSG_BUFFER_OVERFLOW = 1 << 7, APP_MSG_ALREADY_RELEASED = 1 << 9, APP_MSG_CALLBACK_ALREADY_REGISTERED = 1 << 10, APP_MSG_CALLBACK_NOT_REGISTERED = 1 << 11} AppMessageResult;
-typedef struct 
+typedef struct AppMessageCallbacks
+{
+  void (*out_sent)(DictionaryIterator *sent, void *context);
+  void (*out_failed)(DictionaryIterator *failed, AppMessageResult reason, void *context);
+  void (*in_received)(DictionaryIterator *received, void *context);
+  void (*in_dropped)(void *context, AppMessageResult reason);
+} AppMessageCallbacks;
+typedef struct AppMessageCallbacksNode
 {
   ListNode node;
   void *context;
-  struct 
-  {
-    void (*out_sent)(DictionaryIterator *sent, void *context);
-    void (*out_failed)(DictionaryIterator *failed, AppMessageResult reason, void *context);
-    void (*in_received)(DictionaryIterator *received, void *context);
-    void (*in_dropped)(void *context, AppMessageResult reason);
-  } callbacks;
+  AppMessageCallbacks callbacks;
 } AppMessageCallbacksNode;
 typedef struct 
 {
-  struct 
+  struct buffer_sizes
   {
     uint16_t inbound;
     uint16_t outbound;
@@ -244,9 +247,9 @@ typedef struct
   PebbleAppTickHandler tick_handler;
   TimeUnits tick_units;
 } PebbleAppTickInfo;
-typedef struct PebbleAppInputHandlers
+typedef struct 
 {
-  struct 
+  struct buttons
   {
     PebbleAppButtonEventHandler up;
     PebbleAppButtonEventHandler down;
@@ -279,7 +282,7 @@ typedef void *GFont;
 typedef enum {GTextOverflowModeWordWrap, GTextOverflowModeTrailingEllipsis} GTextOverflowMode;
 typedef enum {GTextAlignmentLeft, GTextAlignmentCenter, GTextAlignmentRight} GTextAlignment;
 typedef enum GAlign {GAlignCenter, GAlignTopLeft, GAlignTopRight, GAlignTop, GAlignLeft, GAlignBottom, GAlignRight, GAlignBottomRight, GAlignBottomLeft} GAlign;
-typedef void *GTextLayoutCacheRef;
+typedef TextLayout *GTextLayoutCacheRef;
 typedef struct TextLayer
 {
   Layer layer;
@@ -312,12 +315,12 @@ typedef struct WindowHandlers
 typedef struct ClickConfig
 {
   void *context;
-  struct 
+  struct click
   {
     ClickHandler handler;
     uint16_t repeat_interval_ms;
   } click;
-  struct 
+  struct multi_click
   {
     uint8_t min;
     uint8_t max;
@@ -325,13 +328,13 @@ typedef struct ClickConfig
     ClickHandler handler;
     uint16_t timeout;
   } multi_click;
-  struct 
+  struct long_click
   {
     uint16_t delay_ms;
     ClickHandler handler;
     ClickHandler release_handler;
   } long_click;
-  struct 
+  struct raw
   {
     ClickHandler up_handler;
     ClickHandler down_handler;
@@ -464,8 +467,8 @@ typedef struct MenuIndex
 } MenuIndex;
 typedef void (*MenuLayerSelectionChangedCallback)(struct MenuLayer *menu_layer, MenuIndex new_index, MenuIndex old_index, void *callback_context);
 typedef void (*MenuLayerSelectCallback)(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *callback_context);
-typedef void (*MenuLayerDrawRowCallback)(GContext *ctx, Layer *cell_layer, MenuIndex *cell_index, void *callback_context);
-typedef void (*MenuLayerDrawHeaderCallback)(GContext *ctx, Layer *cell_layer, uint16_t section_index, void *callback_context);
+typedef void (*MenuLayerDrawRowCallback)(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *callback_context);
+typedef void (*MenuLayerDrawHeaderCallback)(GContext *ctx, const Layer *cell_layer, uint16_t section_index, void *callback_context);
 typedef int16_t (*MenuLayerGetHeaderHeightCallback)(struct MenuLayer *menu_layer, uint16_t section_index, void *callback_context);
 typedef int16_t (*MenuLayerGetCellHeightCallback)(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *callback_context);
 typedef uint16_t (*MenuLayerGetNumberOfRowsInSectionsCallback)(struct MenuLayer *menu_layer, uint16_t section_index, void *callback_context);
@@ -703,18 +706,18 @@ void text_layer_set_size(TextLayer *text_layer, const GSize max_size);
 void text_layer_set_overflow_mode(TextLayer *text_layer, GTextOverflowMode line_mode);
 GSize graphics_text_layout_get_max_used_size(GContext *ctx, const char *text, const GFont font, const GRect box, const GTextOverflowMode overflow_mode, const GTextAlignment alignment, GTextLayoutCacheRef layout);
 void inverter_layer_init(InverterLayer *inverter, GRect frame);
-void bitmap_layer_init(BitmapLayer *image, GRect frame);
-void bitmap_layer_set_bitmap(BitmapLayer *image, const GBitmap *bitmap);
-void bitmap_layer_set_alignment(BitmapLayer *image, GAlign alignment);
-void bitmap_layer_set_background_color(BitmapLayer *image, GColor color);
-void bitmap_layer_set_compositing_mode(BitmapLayer *image, GCompOp mode);
+void bitmap_layer_init(BitmapLayer *bitmap_layer, GRect frame);
+void bitmap_layer_set_bitmap(BitmapLayer *bitmap_layer, const GBitmap *bitmap);
+void bitmap_layer_set_alignment(BitmapLayer *bitmap_layer, GAlign alignment);
+void bitmap_layer_set_background_color(BitmapLayer *bitmap_layer, GColor color);
+void bitmap_layer_set_compositing_mode(BitmapLayer *bitmap_layer, GCompOp mode);
 bool heap_bitmap_init(HeapBitmap *hb, int resource_id);
 void heap_bitmap_deinit(HeapBitmap *hb);
 ButtonId click_recognizer_get_button_id(ClickRecognizerRef recognizer);
 uint8_t click_number_of_clicks_counted(ClickRecognizerRef recognizer);
-void menu_cell_basic_draw(GContext *ctx, Layer *cell_layer, const char *title, const char *subtitle, GBitmap *icon);
-void menu_cell_title_draw(GContext *ctx, Layer *cell_layer, const char *title);
-void menu_cell_basic_header_draw(GContext *ctx, Layer *cell_layer, const char *title);
+void menu_cell_basic_draw(GContext *ctx, const Layer *cell_layer, const char *title, const char *subtitle, GBitmap *icon);
+void menu_cell_title_draw(GContext *ctx, const Layer *cell_layer, const char *title);
+void menu_cell_basic_header_draw(GContext *ctx, const Layer *cell_layer, const char *title);
 void menu_layer_init(MenuLayer *menu_layer, GRect frame);
 Layer *menu_layer_get_layer(MenuLayer *menu_layer);
 void menu_layer_set_callbacks(MenuLayer *menu_layer, void *callback_context, MenuLayerCallbacks callbacks);
@@ -732,7 +735,7 @@ void scroll_layer_set_content_offset(ScrollLayer *scroll_layer, GPoint offset, b
 GPoint scroll_layer_get_content_offset(ScrollLayer *scroll_layer);
 void scroll_layer_set_content_size(ScrollLayer *scroll_layer, GSize size);
 GSize scroll_layer_get_content_size(ScrollLayer *scroll_layer);
-void scroll_layer_set_frame(ScrollLayer *scroll_layer, GRect rect);
+void scroll_layer_set_frame(ScrollLayer *scroll_layer, GRect frame);
 void scroll_layer_scroll_up_click_handler(ClickRecognizerRef recognizer, ScrollLayer *scroll_layer);
 void scroll_layer_scroll_down_click_handler(ClickRecognizerRef recognizer, ScrollLayer *scroll_layer);
 void simple_menu_layer_init(SimpleMenuLayer *simple_menu, GRect frame, Window *window, const SimpleMenuSection *sections, int num_sections, void *callback_context);
@@ -761,10 +764,10 @@ AppMessageResult app_message_deregister_callbacks(AppMessageCallbacksNode *callb
 AppMessageResult app_message_out_get(DictionaryIterator **iter_out);
 AppMessageResult app_message_out_send(void);
 AppMessageResult app_message_out_release(void);
-void app_sync_init(AppSync *s, uint8_t *buffer, const uint16_t buffer_size, const Tuplet * const keys_and_initial_values, const uint8_t count, AppSyncTupleChangedCallback tuple_changed_callback, AppSyncErrorCallback error_callback, void *context);
-void app_sync_deinit(AppSync *s);
-AppMessageResult app_sync_set(AppSync *s, const Tuplet * const keys_and_values_to_update, const uint8_t count);
-const Tuple *app_sync_get(const AppSync *s, const uint32_t key);
+void app_sync_init(struct AppSync *s, uint8_t *buffer, const uint16_t buffer_size, const Tuplet * const keys_and_initial_values, const uint8_t count, AppSyncTupleChangedCallback tuple_changed_callback, AppSyncErrorCallback error_callback, void *context);
+void app_sync_deinit(struct AppSync *s);
+AppMessageResult app_sync_set(struct AppSync *s, const Tuplet * const keys_and_values_to_update, const uint8_t count);
+const Tuple *app_sync_get(const struct AppSync *s, const uint32_t key);
 uint32_t dict_calc_buffer_size(const uint8_t tuple_count, ...);
 DictionaryResult dict_write_begin(DictionaryIterator *iter, uint8_t * const buffer, const uint16_t size);
 DictionaryResult dict_write_data(DictionaryIterator *iter, const uint32_t key, const uint8_t * const data, const uint16_t size);
@@ -796,7 +799,7 @@ void action_bar_layer_add_to_window(ActionBarLayer *action_bar, struct Window *w
 void action_bar_layer_remove_from_window(ActionBarLayer *action_bar);
 void action_bar_layer_set_background_color(ActionBarLayer *action_bar, GColor background_color);
 void number_window_init(NumberWindow *numberwindow, const char *label, NumberWindowCallbacks callbacks, void *callback_context);
-void number_window_set_label(NumberWindow *nw, const char *label);
+void number_window_set_label(NumberWindow *numberwindow, const char *label);
 void number_window_set_max(NumberWindow *numberwindow, int max);
 void number_window_set_min(NumberWindow *numberwindow, int min);
 void number_window_set_value(NumberWindow *numberwindow, int value);

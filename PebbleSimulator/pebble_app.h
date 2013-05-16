@@ -16,6 +16,12 @@
 
 //! Macro to set the metadata of the application
 //! @param _uuid The universally unique identifier of your app
+//! @param _name The name of your app (max. 32 bytes long)
+//! @param _company The name of your company (max. 32 bytes long)
+//! @param _version_major The app's major version component (e.g. the '1' in v1.0)
+//! @param _version_minor The app's minor version component (e.g. the '0' in v1.0)
+//! @param _icon_resource_id The resource ID of the app's icon. See \htmlinclude UsingResources.html .
+//! @param _flags Bitmask of \ref PebbleAppFlags values.
 #define PBL_APP_INFO(_uuid, _name, _company, _version_major, _version_minor, _icon_resource_id, _flags)    \
   const PebbleAppInfo __pbl_app_info __attribute__ ((section (".pbl_header"))) = { \
     .header = "PBLAPP", \
