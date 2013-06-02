@@ -16,6 +16,7 @@
 #include "pebble_sim.h"
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreGraphics/CoreGraphics.h>
+#include <time.h>
 
 PblTm pblNow;
 
@@ -198,6 +199,8 @@ void app_event_loop(AppTaskContextRef app_task_ctx, PebbleAppHandlers *handlers)
     
     if (handlers->init_handler)
         handlers->init_handler(app_task_ctx);
+    if (handlers->tick_info.tick_handler)
+        handlers->tick_info.tick_handler(app_task_ctx, &((PebbleTickEvent) { .tick_time = &pblNow, .units_changed = 0 }));
     
     CFRunLoopRun();
     
@@ -359,23 +362,23 @@ void graphics_draw_round_rect(GContext *ctx, GRect rect, int radius)
     CGPathRelease(path);
 }
 
-void get_time(PblTm *time)
+void get_time(PblTm *t)
 {
     // TODO: verify.
-    CFAbsoluteTime itmNow = CFAbsoluteTimeGetCurrent();
-    CFGregorianDate itmGreg = CFAbsoluteTimeGetGregorianDate(itmNow, startupTimeZone);
+    time_t cur = time(NULL);
+    struct tm * itm = localtime(&cur);
 
-    *time = (PblTm)
+    *t = (PblTm)
     {
-        .tm_sec = (int)itmGreg.second,
-        .tm_min = (int)itmGreg.minute,
-        .tm_hour = (int)itmGreg.hour,
-        .tm_mday = (int)itmGreg.day,
-        .tm_mon = (int)itmGreg.month,
-        .tm_year = (int)itmGreg.year,
-        .tm_wday = (int)CFAbsoluteTimeGetDayOfWeek(itmNow, startupTimeZone),
-        .tm_yday = (int)CFAbsoluteTimeGetDayOfYear(itmNow, startupTimeZone),
-        .tm_isdst = (int)CFTimeZoneIsDaylightSavingTime(startupTimeZone, itmNow)
+        .tm_sec = itm->tm_sec,
+        .tm_min = itm->tm_min,
+        .tm_hour = itm->tm_hour,
+        .tm_mday = itm->tm_mday,
+        .tm_mon = itm->tm_mon,
+        .tm_year = itm->tm_year,
+        .tm_wday = itm->tm_wday,
+        .tm_yday = itm->tm_yday,
+        .tm_isdst = itm->tm_isdst
     };
 }
 
@@ -752,6 +755,19 @@ int32_t sin_lookup(int32_t angle)
 void string_format_time(char *ptr, size_t maxsize, const char *format, const PblTm *timeptr)
 {
     // TODO: figure it out.
+    struct tm itm = (struct tm)
+    {
+        .tm_sec = timeptr->tm_sec,
+        .tm_min = timeptr->tm_min,
+        .tm_hour = timeptr->tm_hour,
+        .tm_mday = timeptr->tm_mday,
+        .tm_mon = timeptr->tm_mon,
+        .tm_year = timeptr->tm_year,
+        .tm_wday = timeptr->tm_wday,
+        .tm_yday = timeptr->tm_yday,
+        .tm_isdst = timeptr->tm_isdst
+    };
+    strftime(ptr, maxsize, format, &itm);
 }
 
 void text_layer_init(TextLayer *text_layer, GRect frame)

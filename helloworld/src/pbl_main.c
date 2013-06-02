@@ -19,17 +19,22 @@ void handle_render(AppContextRef app_ctx, PebbleRenderEvent *event)
 
 void handle_init(AppContextRef app_ctx)
 {
-    app_timer_send_event(app_ctx, 2000, 5313178);
+    app_timer_send_event(app_ctx, 5000, 5313178);
 }
 
 void handle_tick(AppContextRef app_ctx, PebbleTickEvent * event)
 {
-    printf("Hello World!\n");
+    PblTm tm;
+    get_time(&tm);
+    char buf[256];
+    char * fmt = "%X %x";
+    string_format_time(buf, 256, fmt, &tm);
+    printf("%s\n", buf);
 }
 
 void handle_timer(AppContextRef app_ctx, AppTimerHandle handle, uint32_t cookie)
 {
-    printf("Cookie: %i", cookie);
+    printf("Cookie: %i\n", cookie);
 }
 
 void pbl_main(void * params)
@@ -40,7 +45,7 @@ void pbl_main(void * params)
         .tick_info = (PebbleAppTickInfo)
         {
             .tick_handler = &handle_tick,
-            .tick_units = MINUTE_UNIT
+            .tick_units = SECOND_UNIT
         },
         .init_handler = &handle_init,
         .timer_handler = &handle_timer
