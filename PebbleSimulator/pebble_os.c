@@ -1539,3 +1539,93 @@ void clock_copy_time_string(char *buffer, uint8_t size)
 {
     // TODO: figure it out.
 }
+
+void gbitmap_init_as_sub_bitmap(GBitmap *sub_bitmap, const GBitmap *base_bitmap, GRect sub_rect)
+{
+    // TODO: figure it out.
+}
+
+void gbitmap_init_with_data(GBitmap *bitmap, const uint8_t *data)
+{
+    // TODO: figure it out.
+}
+
+void app_comm_set_sniff_interval(const SniffInterval interval)
+{
+    // TODO: figure it out.
+}
+
+void app_log(uint8_t log_level, const char *src_filename, int src_line_number, const char *fmt, ...)
+{
+    // TODO: figure it out.
+}
+
+void graphics_draw_rect(GContext *ctx, GRect rect)
+{
+    // TODO: figure it out.
+}
+
+void vibes_cancel(void)
+{
+    // TODO: figure it out.
+}
+
+MenuIndex menu_layer_get_selected_index(MenuLayer *menu_layer)
+{
+    // TODO: figure it out.
+}
+
+bool gpoint_equal(const GPoint * const point_a, const GPoint * const point_b)
+{
+    // TODO: figure it out.
+}
+
+bool grect_contains_point(GRect *rect, GPoint *point)
+{
+    // TODO: figure it out.
+}
+
+void grect_align(GRect *rect, const GRect *inside_rect, const GAlign alignment, const bool clip)
+{
+    // TODO: figure it out.
+}
+
+void grect_clip(GRect * const rect_to_clip, const GRect * const rect_clipper)
+{
+    // TODO: figure it out.
+}
+
+GRect grect_crop(GRect rect, const int crop_size_px)
+{
+    // TODO: figure it out.
+}
+
+bool grect_equal(const GRect * const rect_a, const GRect * const rect_b)
+{
+    // TODO: figure it out.
+}
+
+bool grect_is_empty(const GRect * const rect)
+{
+    // TODO: figure it out.
+}
+
+void grect_standardize(GRect *rect)
+{
+    // TODO: figure it out.
+}
+
+bool gsize_equal(GSize *size_a, GSize *size_b)
+{
+    // TODO: figure it out.
+}
+
+time_t pbl_override_time(time_t *tloc)
+{
+    // TODO: figure it out.
+}
+
+uint16_t time_ms(time_t *tloc, uint16_t *out_ms)
+{
+    // TODO: figure it out.
+}
