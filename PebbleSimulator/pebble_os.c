@@ -22,8 +22,11 @@ PblTm pblNow;
 
 GContext gCtx = (GContext) { NULL };
 CFMutableArrayRef windowStack;
+CFMutableDictionaryRef animationCollection;
 CFMutableDictionaryRef appTimers;
-CFTimeZoneRef startupTimeZone;
+
+void animation_update_applier(const void* key, const void *value, void *context);
+void animation_unschedule_applier(const void *key, const void *value, void *context);
 
 void app_timer_applier(const void *key, const void *value, void *context);
 void app_callback_loop(CFRunLoopTimerRef timer, void * info);
@@ -47,7 +50,9 @@ void animation_init(struct Animation *animation)
         .context = NULL,
         .abs_start_time_ms = 0,
         .delay_ms = 0,
-        .duration_ms = 0
+        .duration_ms = 250,
+        .curve = AnimationCurveEaseInOut,
+        .is_completed = false
     };
 }
 
@@ -90,22 +95,39 @@ void *animation_get_context(struct Animation *animation)
 
 void animation_schedule(struct Animation *animation)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    if (CFDictionaryContainsKey(animationCollection, animation))
+    {
+        animation_unschedule(animation);
+    }
+    
+    animation->implementation->setup(animation);
+    animation->handlers.started(animation, animation->context);
+    uint32_t total_duration = animation->duration_ms + animation->delay_ms;
+    CFDictionaryAddValue(animationCollection, animation, CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &total_duration));
 }
 
 void animation_unschedule(struct Animation *animation)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    if (CFDictionaryContainsKey(animationCollection, animation))
+    {
+        CFDictionaryRemoveValue(animationCollection, animation);
+        animation->handlers.stopped(animation, animation->is_completed, animation->context);
+        animation->implementation->teardown(animation);
+    }
 }
 
 void animation_unschedule_all(void)
 {
     // TODO: figure it out.
+    CFDictionaryApplyFunction(animationCollection, animation_unschedule_applier, NULL);
 }
 
 bool animation_is_scheduled(struct Animation *animation)
 {
     // TODO: figure it out.
+    return (bool)CFDictionaryContainsKey(animationCollection, animation);
 }
 
 AppTimerHandle app_timer_send_event(AppContextRef app_ctx, uint32_t timeout_ms, uint32_t cookie)
@@ -130,13 +152,45 @@ bool app_timer_cancel_event(AppContextRef app_ctx_ref, AppTimerHandle handle)
     return exists;
 }
 
+void animation_unschedule_applier(const void *key, const void *value, void *context)
+{
+    // TODO: verify.
+    Animation* animation = (Animation*)key;
+    animation_unschedule(animation);
+}
+
+
+void animation_update_applier(const void *key, const void *value, void *context)
+{
+    // TODO: verify.
+    Animation* animation = (Animation*)value;
+    CFNumberRef total_duration_ms = (CFNumberRef)value;
+    uint32_t total_duration_ms_val;
+    CFNumberGetValue(total_duration_ms, kCFNumberIntType, &total_duration_ms_val);
+    ++total_duration_ms_val;
+    CFDictionaryReplaceValue(animationCollection, key, CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &total_duration_ms_val));
+    if (total_duration_ms_val >= animation->delay_ms)
+    {
+        if (total_duration_ms_val >= animation->delay_ms + animation->duration_ms)
+        {
+            animation->is_completed = true;
+            animation_unschedule(animation);
+        }
+        else
+        {
+            animation->implementation->update(animation, total_duration_ms_val - animation->delay_ms);
+        }
+    }
+}
+
 void app_timer_applier(const void *key, const void *value, void *context)
 {
+    // TODO: verify.
     CFNumberRef val = (CFNumberRef)value;
     uint32_t baseVal;
     CFNumberGetValue(val, kCFNumberIntType, &baseVal);
     --baseVal;
-    CFDictionaryReplaceValue(appTimers, key, CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &(baseVal)));
+    CFDictionaryReplaceValue(appTimers, key, CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &baseVal));
     if (baseVal == 0)
     {
         uint32_t cookie;
@@ -151,6 +205,8 @@ void app_callback_loop(CFRunLoopTimerRef timer, void * info)
     // TODO: verify.
     SimulatorParams * app_task_ctx = (SimulatorParams *)info;
     PebbleAppHandlers * handlers = app_task_ctx->handlers;
+    
+    CFDictionaryApplyFunction(animationCollection, &animation_update_applier, app_task_ctx);
     
     if (handlers->timer_handler)
     {
@@ -187,10 +243,10 @@ void app_event_loop(AppTaskContextRef app_task_ctx, PebbleAppHandlers *handlers)
     // TODO: verify.
     // VERY IMPORTANT.
     SimulatorParams * app_params = (SimulatorParams *)app_task_ctx;
-    startupTimeZone = CFTimeZoneCopySystem();
     app_params->setGraphicsContext(&gCtx);
     app_params->handlers = handlers;
     
+    animationCollection = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
     appTimers = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
     
     get_time(&pblNow);
@@ -208,7 +264,6 @@ void app_event_loop(AppTaskContextRef app_task_ctx, PebbleAppHandlers *handlers)
         handlers->deinit_handler(app_task_ctx);
     
     CFRelease(timer);
-    CFRelease(startupTimeZone);
 }
 
 bool bmp_init_container(int resource_id, BmpContainer *c)
@@ -1572,17 +1627,20 @@ void vibes_cancel(void)
 
 MenuIndex menu_layer_get_selected_index(MenuLayer *menu_layer)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    return menu_layer->selection.index;
 }
 
 bool gpoint_equal(const GPoint * const point_a, const GPoint * const point_b)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    return point_a == point_b || (point_a->x == point_b->x && point_a->y == point_b->y);
 }
 
 bool grect_contains_point(GRect *rect, GPoint *point)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    return point->x >= rect->origin.x && point->x < rect->origin.x + rect->size.w && point->y >= rect->origin.y && point->y < rect->origin.y + rect->size.h;
 }
 
 void grect_align(GRect *rect, const GRect *inside_rect, const GAlign alignment, const bool clip)
@@ -1597,35 +1655,49 @@ void grect_clip(GRect * const rect_to_clip, const GRect * const rect_clipper)
 
 GRect grect_crop(GRect rect, const int crop_size_px)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    int16_t crop_size_wh = crop_size_px * 2;
+    if (crop_size_wh >= rect.size.h || crop_size_wh >= rect.size.w)
+        return GRectZero;
+    
+    return GRect(rect.origin.x + crop_size_px, rect.origin.y + crop_size_px, rect.size.w - crop_size_wh, rect.size.h - crop_size_wh);
 }
 
 bool grect_equal(const GRect * const rect_a, const GRect * const rect_b)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    return rect_a == rect_b || (gpoint_equal((GPoint*const)&rect_a->origin, (GPoint*const)&rect_b->origin) && gsize_equal((GSize*const)&rect_a->size, (GSize*const)&rect_b->size));
 }
 
 bool grect_is_empty(const GRect * const rect)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    return rect->size.h == 0 || rect->size.w == 0;
 }
 
 void grect_standardize(GRect *rect)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    if (rect->size.h < 0)
+        rect->origin.y -= (rect->size.h *= -1);
+    
+    if (rect->size.w < 0)
+        rect->origin.x -= (rect->size.w *= -1);
 }
 
 bool gsize_equal(GSize *size_a, GSize *size_b)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    return size_a == size_b || (size_a->h == size_b->h && size_a->w == size_b->w);
 }
 
 time_t pbl_override_time(time_t *tloc)
 {
-    // TODO: figure it out.
+    // TODO: nodoc.
 }
 
 uint16_t time_ms(time_t *tloc, uint16_t *out_ms)
 {
     // TODO: figure it out.
+    
 }
