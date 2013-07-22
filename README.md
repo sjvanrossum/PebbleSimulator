@@ -26,8 +26,12 @@ TODO
 ====
 
 - Implement custom graphics backend, because Core Graphics doesn't support various filter modes supplied by Pebble.
+	- Update: After reading Pebble's documentation, this may just be possible using Core Graphics, as filters are only applied to bitmap graphics, thus making it possible to do filtering using binary operations on byte data.
+	- Graphics is still a broken area in the current state of the simulator, because of some rewrites which I haven't been able to do yet.
 - Implement Animations.
+	- Update: Added untested animation implementation.
 - Implement various other features, e.g. resolve remaining ~100 "figure it out." annotated functions.
+	- Update: Just 90 "figure it out." functions left!
 
 You will find each of the pebble_os.c functions annotated with one of the following
 
