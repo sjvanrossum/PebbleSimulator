@@ -120,13 +120,13 @@ void animation_unschedule(struct Animation *animation)
 
 void animation_unschedule_all(void)
 {
-    // TODO: figure it out.
+    // TODO: verify.
     CFDictionaryApplyFunction(animationCollection, animation_unschedule_applier, NULL);
 }
 
 bool animation_is_scheduled(struct Animation *animation)
 {
-    // TODO: figure it out.
+    // TODO: verify.
     return (bool)CFDictionaryContainsKey(animationCollection, animation);
 }
 
@@ -504,16 +504,23 @@ GPoint grect_center_point(GRect *rect)
 
 void layer_mark_dirty(Layer *layer)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    layer->update_proc(layer, &gCtx);
+    Layer * childLayer = layer->first_child;
+    do
+    {
+        layer_mark_dirty(childLayer);
+    }
+    while ((childLayer = childLayer->next_sibling));
 }
 
 void layer_remove_from_parent(Layer *child)
 {
     // TODO: verify.
+    bool didRemove = false;
     if (child->parent)
     {
-        layer_mark_dirty(child->parent);
-        if (child->parent->first_child == child)
+        if ((didRemove = (child->parent->first_child == child)))
         {
             child->parent->first_child = child->next_sibling;
         }
@@ -525,13 +532,14 @@ void layer_remove_from_parent(Layer *child)
                 if (current->next_sibling == child)
                 {
                     current->next_sibling = child->next_sibling;
-                    child->next_sibling = NULL;
-                    child->parent = NULL;
-                    return;
+                    break;
                 }
                 current = current->next_sibling;
             }
         }
+        child->next_sibling = NULL;
+        child->parent = NULL;
+        layer_mark_dirty(child->parent);
     }
 }
 
@@ -809,7 +817,7 @@ int32_t sin_lookup(int32_t angle)
 
 void string_format_time(char *ptr, size_t maxsize, const char *format, const PblTm *timeptr)
 {
-    // TODO: figure it out.
+    // TODO: verify.
     struct tm itm = (struct tm)
     {
         .tm_sec = timeptr->tm_sec,
@@ -992,7 +1000,7 @@ GSize text_layer_get_max_used_size(GContext *ctx, TextLayer *text_layer)
 
 void text_layer_set_size(TextLayer *text_layer, const GSize max_size)
 {
-    // TODO: figure it out.
+    // TODO: verify.
     text_layer->layer.frame.size = max_size;
     text_layer->layer.bounds.size = max_size;
 }
@@ -1159,7 +1167,7 @@ void scroll_layer_set_content_offset(ScrollLayer *scroll_layer, GPoint offset, b
 
 GPoint scroll_layer_get_content_offset(ScrollLayer *scroll_layer)
 {
-    // TODO: figure it out.
+    // TODO: verify.
     return scroll_layer->content_sublayer.bounds.origin;
 }
 
