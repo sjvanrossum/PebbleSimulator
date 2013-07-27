@@ -18,6 +18,7 @@
 
 struct GContext {
     CGContextRef coreGraphicsContext;
+    GCompOp compositingMode;
 };
 
 typedef struct SimulatorParams

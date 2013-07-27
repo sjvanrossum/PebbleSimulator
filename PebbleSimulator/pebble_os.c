@@ -346,7 +346,8 @@ void graphics_context_set_text_color(GContext *ctx, GColor color)
 
 void graphics_context_set_compositing_mode(GContext *ctx, GCompOp mode)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    ctx->compositingMode = mode;
 }
 
 void graphics_draw_pixel(GContext *ctx, GPoint point)
