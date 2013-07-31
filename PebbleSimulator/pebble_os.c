@@ -561,6 +561,9 @@ GRect layer_get_frame(Layer *layer)
 void layer_set_frame(Layer *layer, GRect frame)
 {
     // TODO: verify.
+    if (grect_equal(&frame, &layer->frame))
+        return;
+    
     layer->frame = frame;
     layer->bounds.size = frame.size;
     layer_mark_dirty(layer);
@@ -569,11 +572,11 @@ void layer_set_frame(Layer *layer, GRect frame)
 void layer_set_hidden(Layer *layer, bool hidden)
 {
     // TODO: verify.
-    if (layer->hidden != hidden)
-    {
-        layer->hidden = hidden;
-        layer_mark_dirty(layer);
-    }
+    if (hidden == layer->hidden)
+        return;
+    
+    layer->hidden = hidden;
+    layer_mark_dirty(layer);
 }
 
 void layer_init(Layer *layer, GRect frame)
@@ -593,12 +596,14 @@ void layer_init(Layer *layer, GRect frame)
 
 void light_enable(bool enable)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    // Do nothing?
 }
 
 void light_enable_interaction(void)
 {
     // TODO: figure it out.
+    // Do nothing?
 }
 
 void psleep(int millis)
@@ -932,7 +937,11 @@ void graphics_text_draw(GContext *ctx, const char *text, const GFont font, const
 void layer_set_bounds(Layer *layer, GRect bounds)
 {
     // TODO: verify.
+    if (grect_equal(&bounds, &layer->bounds))
+        return;
+    
     layer->bounds = bounds;
+    layer_mark_dirty(layer);
 }
 
 GRect layer_get_bounds(Layer *layer)
@@ -985,7 +994,11 @@ bool layer_get_hidden(Layer *layer)
 void layer_set_clips(Layer *layer, bool clips)
 {
     // TODO: verify.
+    if (clips == layer->clips)
+        return;
+    
     layer->clips = clips;
+    layer_mark_dirty(layer);
 }
 
 bool layer_get_clips(Layer *layer)
