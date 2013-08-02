@@ -1536,7 +1536,18 @@ DictionaryResult dict_serialize_tuplets(DictionarySerializeCallback callback, vo
 
 DictionaryResult dict_serialize_tuplets_to_buffer(const uint8_t tuplets_count, const Tuplet * const tuplets, uint8_t *buffer, uint32_t *size_in_out)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    
+    // DICTIONARY:
+    // DICT_SIZE (uint8_t)
+    // TUPLET * DICT SIZE
+    //
+    // TUPLET:
+    // KEY (uint32_t)
+    // TYPE (uint8_t)
+    // TYPE_SIZE (uint16_t)
+    // VALUE (TYPE_SIZE)
+    
     uint32_t size;
     uint32_t written;
     
@@ -1546,24 +1557,60 @@ DictionaryResult dict_serialize_tuplets_to_buffer(const uint8_t tuplets_count, c
     size = *size_in_out;
     written = 0;
     
-    if (!size)
-        return DICT_NOT_ENOUGH_STORAGE;
-    
     if (written < size)
         buffer[written] = tuplets_count;
+    else
+        return DICT_NOT_ENOUGH_STORAGE;
     written += 1;
     
     for (int i = 0; i < tuplets_count; ++i)
     {
+        uint16_t dataSize = 0;
+        void * data = NULL;
+        
         if (written < size - 3)
             buffer[written] = tuplets[i].key;
+        else
+            return DICT_NOT_ENOUGH_STORAGE;
         written += 4;
         
         if (written < size)
             buffer[written] = (uint8_t)tuplets[i].type;
+        else
+            return DICT_NOT_ENOUGH_STORAGE;
         written += 1;
         
-        // TODO: Add size, value.
+        switch (tuplets[i].type)
+        {
+            case TUPLE_BYTE_ARRAY:
+                dataSize = tuplets[i].bytes.length;
+                data = (void *)tuplets[i].bytes.data;
+                break;
+            case TUPLE_CSTRING:
+                dataSize = tuplets[i].cstring.length;
+                data = (void *)tuplets[i].cstring.data;
+                break;
+            case TUPLE_INT:
+            case TUPLE_UINT:
+                dataSize = tuplets[i].integer.width;
+                data = (void *)tuplets[i].integer.storage;
+                break;
+            default:
+                // Can't touch this.
+                break;
+        }
+        
+        if (written < size - 1)
+            buffer[written] = dataSize;
+        else
+            return DICT_NOT_ENOUGH_STORAGE;
+        buffer += 2;
+        
+        if (written < size - dataSize)
+            for (int j = 0; j < dataSize; ++j, ++written)
+                buffer[written] = ((uint8_t *)data)[j];
+        else
+            return DICT_NOT_ENOUGH_STORAGE;
     }
     
     *size_in_out = written;
