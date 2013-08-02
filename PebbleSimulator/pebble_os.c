@@ -518,37 +518,47 @@ void layer_mark_dirty(Layer *layer)
 void layer_remove_from_parent(Layer *child)
 {
     // TODO: verify.
-    bool didRemove = false;
-    if (child->parent)
-    {
-        if ((didRemove = (child->parent->first_child == child)))
-        {
-            child->parent->first_child = child->next_sibling;
-        }
-        else
-        {
-            Layer * current = child->parent->first_child;
-            while (current && current != child)
-            {
-                if (current->next_sibling == child)
-                {
-                    current->next_sibling = child->next_sibling;
-                    break;
-                }
-                current = current->next_sibling;
-            }
-        }
-        child->next_sibling = NULL;
-        child->parent = NULL;
-        layer_mark_dirty(child->parent);
-    }
+    Layer* parent;
+    Layer** current;
+    
+    if (!child || !child->parent)
+        return;
+    
+    parent = child->parent;
+    
+    current = &(parent->first_child);
+    while (*current && *current != child)
+        current = &((*current)->next_sibling);
+    
+    if (!*current)
+        return;
+    
+    *current = child->next_sibling;
+    child->next_sibling = NULL;
+    child->parent = NULL;
+    child->window = NULL;
+    layer_mark_dirty(parent);
 }
 
 void layer_add_child(Layer *parent, Layer *child)
 {
     // TODO: verify.
-    child->next_sibling = parent->first_child;
-    parent->first_child = child;
+    Layer** current;
+    
+    if (!parent || !child)
+        return;
+    
+    layer_remove_from_parent(child);
+    
+    current = &parent->first_child;
+    
+    while (*current)
+        current = &((*current)->next_sibling);
+    
+    *current = child;
+    child->next_sibling = NULL;
+    child->parent = parent;
+    child->window = parent->window;
     layer_mark_dirty(parent);
 }
 
@@ -587,7 +597,9 @@ void layer_init(Layer *layer, GRect frame)
         .origin = GPointZero,
         .size = frame.size
     };
+    layer->clips = true;
     layer->frame = frame;
+    layer->hidden = false;
     layer->next_sibling = NULL;
     layer->first_child = NULL;
     layer->parent = NULL;
@@ -787,7 +799,7 @@ void window_init(Window *window, const char *debug_name)
 void window_stack_push(Window *window, bool animated)
 {
     // TODO: verify.
-    //[windowStack addPointer:window];
+    CFArrayAppendValue(windowStack, window);
 }
 
 void window_set_click_config_provider(Window *window, ClickConfigProvider click_config_provider)
@@ -966,23 +978,52 @@ void layer_remove_child_layers(Layer *parent)
 {
     // TODO: verify.
     Layer * current = parent->first_child;
+    parent->first_child = NULL;
     while (current)
     {
         current->parent = NULL;
+        current->window = NULL;
         current = current->next_sibling;
         current->next_sibling = NULL;
     }
-    parent->first_child = NULL;
+    layer_mark_dirty(parent);
 }
 
 void layer_insert_below_sibling(Layer *layer_to_insert, Layer *below_sibling_layer)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    Layer* parent;
+    Layer** current;
+    
+    if (!layer_to_insert || !below_sibling_layer || !below_sibling_layer->parent)
+        return;
+    
+    parent = below_sibling_layer->parent;
+    current = &parent->first_child;
+    while (*current && *current != below_sibling_layer)
+        current = &((*current)->next_sibling);
+    
+    if (!*current)
+        return;
+    
+    *current = layer_to_insert;
+    layer_to_insert->next_sibling = below_sibling_layer;
+    layer_to_insert->parent = parent;
+    layer_to_insert->window = parent->window;
+    layer_mark_dirty(parent);
 }
 
 void layer_insert_above_sibling(Layer *layer_to_insert, Layer *above_sibling_layer)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    if (!layer_to_insert || !above_sibling_layer || !above_sibling_layer->parent)
+        return;
+    
+    layer_to_insert->next_sibling = above_sibling_layer->next_sibling;
+    above_sibling_layer->next_sibling = layer_to_insert;
+    layer_to_insert->parent = above_sibling_layer->parent;
+    layer_to_insert->window = layer_to_insert->parent->window;
+    layer_mark_dirty(above_sibling_layer->parent);
 }
 
 bool layer_get_hidden(Layer *layer)
@@ -1264,7 +1305,7 @@ void window_set_window_handlers(Window *window, WindowHandlers handlers)
 struct Layer *window_get_root_layer(Window *window)
 {
     // TODO: verify.
-    return &window->layer; // TODO: verify correctness?
+    return &(window->layer);
 }
 
 bool window_get_fullscreen(Window *window)
@@ -1290,32 +1331,33 @@ bool window_is_loaded(Window *window)
 Window *window_stack_pop(bool animated)
 {
     // TODO: verify.
-    //NSUInteger i = [windowStack count] - 1;
-    //Window * window = [windowStack pointerAtIndex:i];
+    CFIndex idx = CFArrayGetCount(windowStack) - 1;
+    Window* window = (Window *)CFArrayGetValueAtIndex(windowStack, idx);
     
-    //[windowStack removePointerAtIndex:i];
+    CFArrayRemoveValueAtIndex(windowStack, idx);
     
-    //return window;
+    return window;
 }
 
 void window_stack_pop_all(const bool animated)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    CFArrayRemoveAllValues(windowStack);
 }
 
 bool window_stack_contains_window(Window *window)
 {
     // TODO: verify.
-    //return [[windowStack allObjects] containsObject:[NSValue valueWithPointer:window]];
+    return CFArrayContainsValue(windowStack, CFRangeMake(0, CFArrayGetCount(windowStack)), window);
 }
 
 Window *window_stack_get_top_window(void)
 {
     // TODO: verify.
-    //NSUInteger i = [windowStack count] - 1;
-    //Window * window = [windowStack pointerAtIndex:i];
+    CFIndex idx = CFArrayGetCount(windowStack) - 1;
+    Window* window = (Window *)CFArrayGetValueAtIndex(windowStack, idx);
     
-    //return window;
+    return window;
 }
 
 Window *window_stack_remove(Window *window, bool animated)
@@ -1391,7 +1433,16 @@ const Tuple *app_sync_get(const struct AppSync *s, const uint32_t key)
 
 uint32_t dict_calc_buffer_size(const uint8_t tuple_count, ...)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    size_t size = 1 + (tuple_count * 7);
+    va_list vargs;
+    va_start(vargs, tuple_count);
+    for (int i = 0; i < tuple_count; i++)
+    {
+        size += va_arg(vargs, size_t);
+    }
+    va_end(vargs);
+    return (uint32_t)size;
 }
 
 DictionaryResult dict_write_begin(DictionaryIterator *iter, uint8_t * const buffer, const uint16_t size)
@@ -1486,6 +1537,37 @@ DictionaryResult dict_serialize_tuplets(DictionarySerializeCallback callback, vo
 DictionaryResult dict_serialize_tuplets_to_buffer(const uint8_t tuplets_count, const Tuplet * const tuplets, uint8_t *buffer, uint32_t *size_in_out)
 {
     // TODO: figure it out.
+    uint32_t size;
+    uint32_t written;
+    
+    if (!tuplets || !buffer || !size_in_out)
+        return DICT_INVALID_ARGS;
+    
+    size = *size_in_out;
+    written = 0;
+    
+    if (!size)
+        return DICT_NOT_ENOUGH_STORAGE;
+    
+    if (written < size)
+        buffer[written] = tuplets_count;
+    written += 1;
+    
+    for (int i = 0; i < tuplets_count; ++i)
+    {
+        if (written < size - 3)
+            buffer[written] = tuplets[i].key;
+        written += 4;
+        
+        if (written < size)
+            buffer[written] = (uint8_t)tuplets[i].type;
+        written += 1;
+        
+        // TODO: Add size, value.
+    }
+    
+    *size_in_out = written;
+    return DICT_OK;
 }
 
 DictionaryResult dict_serialize_tuplets_to_buffer_with_iter(const uint8_t tuplets_count, const Tuplet * const tuplets, DictionaryIterator *iter, uint8_t *buffer, uint32_t *size_in_out)
@@ -1500,7 +1582,28 @@ DictionaryResult dict_write_tuplet(DictionaryIterator *iter, const Tuplet * cons
 
 uint32_t dict_calc_buffer_size_from_tuplets(const uint8_t tuplets_count, const Tuplet * const tuplets)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    size_t size = 1 + (tuplets_count * 7);
+    for (int i = 0; i < tuplets_count; i++)
+    {
+        switch (tuplets[i].type)
+        {
+            case TUPLE_BYTE_ARRAY:
+                size += tuplets[i].bytes.length;
+                break;
+            case TUPLE_CSTRING:
+                size += tuplets[i].cstring.length;
+                break;
+            case TUPLE_INT:
+            case TUPLE_UINT:
+                size += tuplets[i].integer.width;
+                break;
+            default:
+                // Can't touch this.
+                break;
+        }
+    }
+    return (uint32_t)size;
 }
 
 DictionaryResult dict_merge(DictionaryIterator *dest, uint32_t *dest_max_size_in_out, DictionaryIterator *source, const bool update_existing_keys_only, const DictionaryKeyUpdatedCallback key_callback, void *context)
