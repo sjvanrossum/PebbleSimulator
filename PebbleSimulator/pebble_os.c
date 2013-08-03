@@ -1434,7 +1434,7 @@ const Tuple *app_sync_get(const struct AppSync *s, const uint32_t key)
 uint32_t dict_calc_buffer_size(const uint8_t tuple_count, ...)
 {
     // TODO: verify.
-    size_t size = 1 + (tuple_count * 7);
+    uint32_t size = 1 + (tuple_count * 7);
     va_list vargs;
     va_start(vargs, tuple_count);
     for (int i = 0; i < tuple_count; i++)
@@ -1442,7 +1442,7 @@ uint32_t dict_calc_buffer_size(const uint8_t tuple_count, ...)
         size += va_arg(vargs, size_t);
     }
     va_end(vargs);
-    return (uint32_t)size;
+    return size;
 }
 
 DictionaryResult dict_write_begin(DictionaryIterator *iter, uint8_t * const buffer, const uint16_t size)
@@ -1548,14 +1548,13 @@ DictionaryResult dict_serialize_tuplets_to_buffer(const uint8_t tuplets_count, c
     // TYPE_SIZE (uint16_t)
     // VALUE (TYPE_SIZE)
     
-    uint32_t size;
-    uint32_t written;
+    uint32_t size = 0;
+    uint32_t written = 0;
     
     if (!tuplets || !buffer || !size_in_out)
         return DICT_INVALID_ARGS;
     
     size = *size_in_out;
-    written = 0;
     
     if (written < size)
         buffer[written] = tuplets_count;
@@ -1569,13 +1568,13 @@ DictionaryResult dict_serialize_tuplets_to_buffer(const uint8_t tuplets_count, c
         void * data = NULL;
         
         if (written < size - 3)
-            buffer[written] = tuplets[i].key;
+            *(uint32_t *)(buffer + written) = tuplets[i].key;
         else
             return DICT_NOT_ENOUGH_STORAGE;
         written += 4;
         
         if (written < size)
-            buffer[written] = (uint8_t)tuplets[i].type;
+            *(buffer+written) = (uint8_t)tuplets[i].type;
         else
             return DICT_NOT_ENOUGH_STORAGE;
         written += 1;
@@ -1593,20 +1592,20 @@ DictionaryResult dict_serialize_tuplets_to_buffer(const uint8_t tuplets_count, c
             case TUPLE_INT:
             case TUPLE_UINT:
                 dataSize = tuplets[i].integer.width;
-                data = (void *)tuplets[i].integer.storage;
+                data = (void *)&tuplets[i].integer.storage;
                 break;
             default:
                 // Can't touch this.
                 break;
         }
-        
+                
         if (written < size - 1)
-            buffer[written] = dataSize;
+            *(uint16_t *)(buffer + written) = dataSize;
         else
             return DICT_NOT_ENOUGH_STORAGE;
-        buffer += 2;
+        written += 2;
         
-        if (written < size - dataSize)
+        if (written <= size - dataSize)
             for (int j = 0; j < dataSize; ++j, ++written)
                 buffer[written] = ((uint8_t *)data)[j];
         else
@@ -1630,7 +1629,7 @@ DictionaryResult dict_write_tuplet(DictionaryIterator *iter, const Tuplet * cons
 uint32_t dict_calc_buffer_size_from_tuplets(const uint8_t tuplets_count, const Tuplet * const tuplets)
 {
     // TODO: verify.
-    size_t size = 1 + (tuplets_count * 7);
+    uint32_t size = 1 + (tuplets_count * 7);
     for (int i = 0; i < tuplets_count; i++)
     {
         switch (tuplets[i].type)
@@ -1650,7 +1649,7 @@ uint32_t dict_calc_buffer_size_from_tuplets(const uint8_t tuplets_count, const T
                 break;
         }
     }
-    return (uint32_t)size;
+    return size;
 }
 
 DictionaryResult dict_merge(DictionaryIterator *dest, uint32_t *dest_max_size_in_out, DictionaryIterator *source, const bool update_existing_keys_only, const DictionaryKeyUpdatedCallback key_callback, void *context)
