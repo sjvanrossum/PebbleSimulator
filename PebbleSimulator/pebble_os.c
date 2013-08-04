@@ -1447,17 +1447,55 @@ uint32_t dict_calc_buffer_size(const uint8_t tuple_count, ...)
 
 DictionaryResult dict_write_begin(DictionaryIterator *iter, uint8_t * const buffer, const uint16_t size)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    if (!iter || !buffer)
+        return DICT_INVALID_ARGS;
+    
+    iter->end = (void *)(buffer + size);
+    iter->dictionary = (Dictionary *)buffer;
+    iter->dictionary->count = 0;
+    
+    return DICT_OK;
 }
 
 DictionaryResult dict_write_data(DictionaryIterator *iter, const uint32_t key, const uint8_t * const data, const uint16_t size)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    if (!iter)
+        return DICT_INVALID_ARGS;
+    
+    if (iter->end < (void *)iter->cursor->value + size)
+        return DICT_NOT_ENOUGH_STORAGE;
+    
+    iter->cursor->key = key;
+    iter->cursor->length = size;
+    iter->cursor->type = TUPLE_BYTE_ARRAY;
+    memcpy(iter->cursor->value->data, data, size);
+    
+    ++iter->dictionary->count;
+    iter->cursor = (void*)iter->cursor->value + size;
+    return DICT_OK;
 }
 
 DictionaryResult dict_write_cstring(DictionaryIterator *iter, const uint32_t key, const char * const cstring)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    size_t size = strlen(cstring) + 1;
+    
+    if (!iter)
+        return DICT_INVALID_ARGS;
+    
+    if (iter->end < (void *)iter->cursor->value + size)
+        return DICT_NOT_ENOUGH_STORAGE;
+    
+    iter->cursor->key = key;
+    iter->cursor->length = size;
+    iter->cursor->type = TUPLE_BYTE_ARRAY;
+    memcpy(iter->cursor->value->cstring, cstring, size);
+    
+    ++iter->dictionary->count;
+    iter->cursor = (void*)iter->cursor->value + size;
+    return DICT_OK;
 }
 
 DictionaryResult dict_write_int(DictionaryIterator *iter, const uint32_t key, const void *integer, const uint8_t width_bytes, const bool is_signed)
@@ -1479,59 +1517,183 @@ DictionaryResult dict_write_int(DictionaryIterator *iter, const uint32_t key, co
 
 DictionaryResult dict_write_uint8(DictionaryIterator *iter, const uint32_t key, const uint8_t value)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    size_t size = sizeof(value);
+    
+    if (!iter)
+        return DICT_INVALID_ARGS;
+    
+    if (iter->end < (void *)iter->cursor->value + size)
+        return DICT_NOT_ENOUGH_STORAGE;
+    
+    iter->cursor->key = key;
+    iter->cursor->length = size;
+    iter->cursor->type = TUPLE_UINT;
+    iter->cursor->value->uint8 = value;
+    
+    ++iter->dictionary->count;
+    iter->cursor = (void*)iter->cursor->value + size;
+    return DICT_OK;
 }
 
 DictionaryResult dict_write_uint16(DictionaryIterator *iter, const uint32_t key, const uint16_t value)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    size_t size = sizeof(value);
+    
+    if (!iter)
+        return DICT_INVALID_ARGS;
+    
+    if (iter->end < (void *)iter->cursor->value + size)
+        return DICT_NOT_ENOUGH_STORAGE;
+    
+    iter->cursor->key = key;
+    iter->cursor->length = size;
+    iter->cursor->type = TUPLE_UINT;
+    iter->cursor->value->uint16 = value;
+    
+    ++iter->dictionary->count;
+    iter->cursor = (void*)iter->cursor->value + size;
+    return DICT_OK;
 }
 
 DictionaryResult dict_write_uint32(DictionaryIterator *iter, const uint32_t key, const uint32_t value)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    size_t size = sizeof(value);
+    
+    if (!iter)
+        return DICT_INVALID_ARGS;
+    
+    if (iter->end < (void *)iter->cursor->value + size)
+        return DICT_NOT_ENOUGH_STORAGE;
+    
+    iter->cursor->key = key;
+    iter->cursor->length = size;
+    iter->cursor->type = TUPLE_UINT;
+    iter->cursor->value->uint32 = value;
+    
+    ++iter->dictionary->count;
+    iter->cursor = (void*)iter->cursor->value + size;
+    return DICT_OK;
 }
 
 DictionaryResult dict_write_int8(DictionaryIterator *iter, const uint32_t key, const int8_t value)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    size_t size = sizeof(value);
+    
+    if (!iter)
+        return DICT_INVALID_ARGS;
+    
+    if (iter->end < (void *)iter->cursor->value + size)
+        return DICT_NOT_ENOUGH_STORAGE;
+    
+    iter->cursor->key = key;
+    iter->cursor->length = size;
+    iter->cursor->type = TUPLE_UINT;
+    iter->cursor->value->int8 = value;
+    
+    ++iter->dictionary->count;
+    iter->cursor = (void*)iter->cursor->value + size;
+    return DICT_OK;
 }
 
 DictionaryResult dict_write_int16(DictionaryIterator *iter, const uint32_t key, const int16_t value)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    size_t size = sizeof(value);
+    
+    if (!iter)
+        return DICT_INVALID_ARGS;
+    
+    if (iter->end < (void *)iter->cursor->value + size)
+        return DICT_NOT_ENOUGH_STORAGE;
+    
+    iter->cursor->key = key;
+    iter->cursor->length = size;
+    iter->cursor->type = TUPLE_UINT;
+    iter->cursor->value->int16 = value;
+    
+    ++iter->dictionary->count;
+    iter->cursor = (void*)iter->cursor->value + size;
+    return DICT_OK;
 }
 
 DictionaryResult dict_write_int32(DictionaryIterator *iter, const uint32_t key, const int32_t value)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    size_t size = sizeof(value);
+    
+    if (!iter)
+        return DICT_INVALID_ARGS;
+    
+    if (iter->end < (void *)iter->cursor->value + size)
+        return DICT_NOT_ENOUGH_STORAGE;
+    
+    iter->cursor->key = key;
+    iter->cursor->length = size;
+    iter->cursor->type = TUPLE_UINT;
+    iter->cursor->value->int32 = value;
+    
+    ++iter->dictionary->count;
+    iter->cursor = (void*)iter->cursor->value + size;
+    return DICT_OK;
 }
 
 uint32_t dict_write_end(DictionaryIterator *iter)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    if (!iter)
+        return 0;
+    
+    uint32_t dict_size = (uint32_t)((void*)iter->cursor - (void*)iter->dictionary);
+    dict_read_first(iter);
+    return dict_size;
 }
 
 Tuple *dict_read_begin_from_buffer(DictionaryIterator *iter, const uint8_t * const buffer, const uint16_t size)
 {
     // TODO: figure it out.
+    iter->dictionary = (Dictionary *)buffer;
+    iter->cursor = iter->dictionary->head;
+    
+    return iter->cursor;
 }
 
 Tuple *dict_read_next(DictionaryIterator *iter)
 {
     // TODO: verify.
-    return ++iter->cursor;
+    return (iter->cursor = ((void*)iter->cursor->value + iter->cursor->length));
 }
 
 Tuple *dict_read_first(DictionaryIterator *iter)
 {
     // TODO: verify.
-    return iter->dictionary->head;
+    iter->cursor = iter->dictionary->head;
+    return iter->cursor;
 }
 
 DictionaryResult dict_serialize_tuplets(DictionarySerializeCallback callback, void *context, const uint8_t tuplets_count, const Tuplet * const tuplets)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    
+    if (!tuplets)
+        return DICT_INVALID_ARGS;
+    
+    uint32_t size = dict_calc_buffer_size_from_tuplets(tuplets_count, tuplets);
+    
+    if (size > UINT16_MAX)
+        return DICT_NOT_ENOUGH_STORAGE;
+    
+    uint8_t buf[size];
+    
+    DictionaryResult res = dict_serialize_tuplets_to_buffer(tuplets_count, tuplets, buf, &size);
+    
+    if (res == DICT_OK && callback)
+        callback(buf, (uint16_t)size, context);
+    
+    return res;
 }
 
 DictionaryResult dict_serialize_tuplets_to_buffer(const uint8_t tuplets_count, const Tuplet * const tuplets, uint8_t *buffer, uint32_t *size_in_out)
@@ -1595,7 +1757,7 @@ DictionaryResult dict_serialize_tuplets_to_buffer(const uint8_t tuplets_count, c
                 data = (void *)&tuplets[i].integer.storage;
                 break;
             default:
-                // Can't touch this.
+                return DICT_INVALID_ARGS;
                 break;
         }
                 
@@ -1618,12 +1780,40 @@ DictionaryResult dict_serialize_tuplets_to_buffer(const uint8_t tuplets_count, c
 
 DictionaryResult dict_serialize_tuplets_to_buffer_with_iter(const uint8_t tuplets_count, const Tuplet * const tuplets, DictionaryIterator *iter, uint8_t *buffer, uint32_t *size_in_out)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    DictionaryResult res = dict_write_begin(iter, buffer, *size_in_out);
+    int i = 0;
+    
+    while (i < tuplets_count && res == DICT_OK)
+    {
+        res = dict_write_tuplet(iter, &tuplets[i]);
+        ++i;
+    }
+    
+    if (res == DICT_OK)
+        *size_in_out = dict_write_end(iter);
+    
+    return res;
 }
 
 DictionaryResult dict_write_tuplet(DictionaryIterator *iter, const Tuplet * const tuplet)
 {
-    // TODO: figure it out.
+    // TODO: verify.    
+    if (!iter || !tuplet)
+        return DICT_INVALID_ARGS;
+    
+    switch (tuplet->type)
+    {
+        case TUPLE_BYTE_ARRAY:
+            return dict_write_data(iter, tuplet->key, tuplet->bytes.data, tuplet->bytes.length);
+        case TUPLE_CSTRING:
+            return dict_write_cstring(iter, tuplet->key, tuplet->cstring.data);
+        case TUPLE_INT:
+        case TUPLE_UINT:
+            return dict_write_int(iter, tuplet->key, &tuplet->integer.storage, (uint8_t)tuplet->integer.width, tuplet->type == TUPLE_INT);
+        default:
+            return DICT_INVALID_ARGS;
+    }
 }
 
 uint32_t dict_calc_buffer_size_from_tuplets(const uint8_t tuplets_count, const Tuplet * const tuplets)
