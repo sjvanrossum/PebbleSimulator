@@ -17,6 +17,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreGraphics/CoreGraphics.h>
 #include <time.h>
+#include <sys/time.h>
 
 PblTm pblNow;
 
@@ -614,15 +615,14 @@ void light_enable(bool enable)
 
 void light_enable_interaction(void)
 {
-    // TODO: figure it out.
+    // TODO: verify.
     // Do nothing?
 }
 
 void psleep(int millis)
 {
-    if (millis > 0)
-        usleep((useconds_t)millis);
-    // TODO: figure it out.
+    // TODO: verify.
+    usleep((useconds_t)millis);
 }
 
 void resource_init_current_app(ResVersionHandle version)
@@ -1451,9 +1451,13 @@ DictionaryResult dict_write_begin(DictionaryIterator *iter, uint8_t * const buff
     if (!iter || !buffer)
         return DICT_INVALID_ARGS;
     
+    if (!size)
+        return DICT_NOT_ENOUGH_STORAGE;
+    
     iter->end = (void *)(buffer + size);
     iter->dictionary = (Dictionary *)buffer;
     iter->dictionary->count = 0;
+    iter->cursor = iter->dictionary->head;
     
     return DICT_OK;
 }
@@ -1490,7 +1494,7 @@ DictionaryResult dict_write_cstring(DictionaryIterator *iter, const uint32_t key
     
     iter->cursor->key = key;
     iter->cursor->length = size;
-    iter->cursor->type = TUPLE_BYTE_ARRAY;
+    iter->cursor->type = TUPLE_CSTRING;
     memcpy(iter->cursor->value->cstring, cstring, size);
     
     ++iter->dictionary->count;
@@ -1506,9 +1510,9 @@ DictionaryResult dict_write_int(DictionaryIterator *iter, const uint32_t key, co
         case 1:
             return is_signed ? dict_write_int8(iter, key, *(int8_t *)integer) : dict_write_uint8(iter, key, *(uint8_t *)integer);
         case 2:
-            return is_signed ? dict_write_int8(iter, key, *(int16_t *)integer) : dict_write_uint8(iter, key, *(uint16_t *)integer);
+            return is_signed ? dict_write_int16(iter, key, *(int16_t *)integer) : dict_write_uint16(iter, key, *(uint16_t *)integer);
         case 4:
-            return is_signed ? dict_write_int8(iter, key, *(int32_t *)integer) : dict_write_uint8(iter, key, *(uint32_t *)integer);
+            return is_signed ? dict_write_int32(iter, key, *(int32_t *)integer) : dict_write_uint32(iter, key, *(uint32_t *)integer);
         default:
             return DICT_INVALID_ARGS;
     }
@@ -1591,7 +1595,7 @@ DictionaryResult dict_write_int8(DictionaryIterator *iter, const uint32_t key, c
     
     iter->cursor->key = key;
     iter->cursor->length = size;
-    iter->cursor->type = TUPLE_UINT;
+    iter->cursor->type = TUPLE_INT;
     iter->cursor->value->int8 = value;
     
     ++iter->dictionary->count;
@@ -1612,7 +1616,7 @@ DictionaryResult dict_write_int16(DictionaryIterator *iter, const uint32_t key, 
     
     iter->cursor->key = key;
     iter->cursor->length = size;
-    iter->cursor->type = TUPLE_UINT;
+    iter->cursor->type = TUPLE_INT;
     iter->cursor->value->int16 = value;
     
     ++iter->dictionary->count;
@@ -1633,7 +1637,7 @@ DictionaryResult dict_write_int32(DictionaryIterator *iter, const uint32_t key, 
     
     iter->cursor->key = key;
     iter->cursor->length = size;
-    iter->cursor->type = TUPLE_UINT;
+    iter->cursor->type = TUPLE_INT;
     iter->cursor->value->int32 = value;
     
     ++iter->dictionary->count;
@@ -1647,24 +1651,30 @@ uint32_t dict_write_end(DictionaryIterator *iter)
     if (!iter)
         return 0;
     
-    uint32_t dict_size = (uint32_t)((void*)iter->cursor - (void*)iter->dictionary);
-    dict_read_first(iter);
-    return dict_size;
+    return (uint32_t)((iter->end = (void*)iter->cursor) - (void *)iter->dictionary);
 }
 
 Tuple *dict_read_begin_from_buffer(DictionaryIterator *iter, const uint8_t * const buffer, const uint16_t size)
 {
-    // TODO: figure it out.
-    iter->dictionary = (Dictionary *)buffer;
-    iter->cursor = iter->dictionary->head;
+    // TODO: verify.
+    if (!iter || !buffer || !size)
+        return NULL;
     
-    return iter->cursor;
+    iter->dictionary = (Dictionary *)buffer;
+    iter->end = (void *)buffer + size;
+    
+    return dict_read_first(iter);
 }
 
 Tuple *dict_read_next(DictionaryIterator *iter)
 {
     // TODO: verify.
-    return (iter->cursor = ((void*)iter->cursor->value + iter->cursor->length));
+    void * newCursor = (void*)iter->cursor->value + iter->cursor->length;
+    
+    if (newCursor < iter->end)
+        return (iter->cursor = newCursor);
+    else
+        return NULL;
 }
 
 Tuple *dict_read_first(DictionaryIterator *iter)
@@ -1699,99 +1709,27 @@ DictionaryResult dict_serialize_tuplets(DictionarySerializeCallback callback, vo
 DictionaryResult dict_serialize_tuplets_to_buffer(const uint8_t tuplets_count, const Tuplet * const tuplets, uint8_t *buffer, uint32_t *size_in_out)
 {
     // TODO: verify.
+    DictionaryIterator iter;
     
-    // DICTIONARY:
-    // DICT_SIZE (uint8_t)
-    // TUPLET * DICT SIZE
-    //
-    // TUPLET:
-    // KEY (uint32_t)
-    // TYPE (uint8_t)
-    // TYPE_SIZE (uint16_t)
-    // VALUE (TYPE_SIZE)
-    
-    uint32_t size = 0;
-    uint32_t written = 0;
-    
-    if (!tuplets || !buffer || !size_in_out)
-        return DICT_INVALID_ARGS;
-    
-    size = *size_in_out;
-    
-    if (written < size)
-        buffer[written] = tuplets_count;
-    else
-        return DICT_NOT_ENOUGH_STORAGE;
-    written += 1;
-    
-    for (int i = 0; i < tuplets_count; ++i)
-    {
-        uint16_t dataSize = 0;
-        void * data = NULL;
-        
-        if (written < size - 3)
-            *(uint32_t *)(buffer + written) = tuplets[i].key;
-        else
-            return DICT_NOT_ENOUGH_STORAGE;
-        written += 4;
-        
-        if (written < size)
-            *(buffer+written) = (uint8_t)tuplets[i].type;
-        else
-            return DICT_NOT_ENOUGH_STORAGE;
-        written += 1;
-        
-        switch (tuplets[i].type)
-        {
-            case TUPLE_BYTE_ARRAY:
-                dataSize = tuplets[i].bytes.length;
-                data = (void *)tuplets[i].bytes.data;
-                break;
-            case TUPLE_CSTRING:
-                dataSize = tuplets[i].cstring.length;
-                data = (void *)tuplets[i].cstring.data;
-                break;
-            case TUPLE_INT:
-            case TUPLE_UINT:
-                dataSize = tuplets[i].integer.width;
-                data = (void *)&tuplets[i].integer.storage;
-                break;
-            default:
-                return DICT_INVALID_ARGS;
-                break;
-        }
-                
-        if (written < size - 1)
-            *(uint16_t *)(buffer + written) = dataSize;
-        else
-            return DICT_NOT_ENOUGH_STORAGE;
-        written += 2;
-        
-        if (written <= size - dataSize)
-            for (int j = 0; j < dataSize; ++j, ++written)
-                buffer[written] = ((uint8_t *)data)[j];
-        else
-            return DICT_NOT_ENOUGH_STORAGE;
-    }
-    
-    *size_in_out = written;
-    return DICT_OK;
+    return dict_serialize_tuplets_to_buffer_with_iter(tuplets_count, tuplets, &iter, buffer, size_in_out);
 }
 
 DictionaryResult dict_serialize_tuplets_to_buffer_with_iter(const uint8_t tuplets_count, const Tuplet * const tuplets, DictionaryIterator *iter, uint8_t *buffer, uint32_t *size_in_out)
 {
     // TODO: verify.
+    if (!size_in_out)
+        return DICT_INVALID_ARGS;
+    
     DictionaryResult res = dict_write_begin(iter, buffer, *size_in_out);
     int i = 0;
     
     while (i < tuplets_count && res == DICT_OK)
     {
-        res = dict_write_tuplet(iter, &tuplets[i]);
+        res = dict_write_tuplet(iter, tuplets + i);
         ++i;
     }
     
-    if (res == DICT_OK)
-        *size_in_out = dict_write_end(iter);
+    *size_in_out = dict_write_end(iter);
     
     return res;
 }
@@ -1849,7 +1787,21 @@ DictionaryResult dict_merge(DictionaryIterator *dest, uint32_t *dest_max_size_in
 
 Tuple *dict_find(const DictionaryIterator *iter, const uint32_t key)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    if (!iter)
+        return NULL;
+    
+    DictionaryIterator search_iter;
+    Tuple * res = dict_read_begin_from_buffer(&search_iter, (void *)iter->dictionary, iter->end - (void *)iter->dictionary);
+    
+    do
+    {
+        if (res->key == key)
+            break;
+    }
+    while ((res = dict_read_next(&search_iter)));
+    
+    return res;
 }
 
 void action_bar_layer_init(ActionBarLayer *action_bar)
@@ -2055,10 +2007,19 @@ bool gsize_equal(GSize *size_a, GSize *size_b)
 time_t pbl_override_time(time_t *tloc)
 {
     // TODO: nodoc.
+    return 0;
 }
 
 uint16_t time_ms(time_t *tloc, uint16_t *out_ms)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    struct timeval current;
+    gettimeofday(&current, NULL);
+    if (tloc)
+        *tloc = current.tv_sec;
     
+    if (out_ms)
+        return (*out_ms = (uint16_t)(current.tv_usec / 1000));
+    else
+        return (uint16_t)(current.tv_usec / 1000);
 }
