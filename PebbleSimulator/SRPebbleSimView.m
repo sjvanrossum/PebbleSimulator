@@ -24,6 +24,10 @@ SimulatorParams params;
 void setAppHandlers(PebbleAppHandlers * handlers)
 {
     appHandlers = handlers;
+    
+    // Handled in pebble_os.
+    
+    /*
     // timer handler
     if (handlers->timer_handler)
     {
@@ -35,6 +39,8 @@ void setAppHandlers(PebbleAppHandlers * handlers)
     {
         
     }
+    */
+    
     // input handlers
     // down
     if (handlers->input_handlers.buttons.down)
@@ -67,6 +73,10 @@ void setAppHandlers(PebbleAppHandlers * handlers)
     {
         
     }
+    
+    // Handled in pebble_os.
+    
+    /*
     // deinit handler
     if (handlers->deinit_handler)
     {
@@ -77,15 +87,29 @@ void setAppHandlers(PebbleAppHandlers * handlers)
     {
         
     }
+    */
 }
 
-void setGraphicsContext(GContext * context)
+void setGraphicsContext(SimulatorGContext * context)
 {
     while (!graphicsContext)
     {
     }
     context->coreGraphicsContext = graphicsContext;
     ctx = context;
+}
+
+void setClickConfigs(ClickConfig** clickConfigs, void * obj)
+{
+    //self.backButton.clickConfig = clickConfigs[0];
+    //self.upButton.clickConfig = clickConfigs[1];
+    //self.selectButton.clickConfig = clickConfigs[2];
+    //self.downButton.clickConfig = clickConfigs[3];
+}
+
+- (void)awakeFromNib
+{
+    [self allocateGState];
 }
 
 - (id)initWithFrame:(NSRect)frame
@@ -103,52 +127,25 @@ void setGraphicsContext(GContext * context)
     [super dealloc];
 }
 
-- (void)awakeFromNib
-{
-    [self performSelectorInBackground:@selector(awakePebbleApp) withObject:nil];
-}
-
-- (void)awakePebbleApp
-{
-    dlhandle = dlopen("/Users/stev/Documents/XCode/PebbleSimulator/DerivedData/PebbleSimulator/Build/Products/Debug/libhelloworld.dylib", RTLD_NOW | RTLD_FIRST);
-    pbl_main = dlsym(dlhandle, "pbl_main");
-    params.setGraphicsContext = &setGraphicsContext;
-    params.setAppHandlers = &setAppHandlers;
-    pbl_main(&params);
-}
-
 - (void)setUpGState
 {
     if (!graphicsContext)
     {
         graphicsContext = [[NSGraphicsContext currentContext] graphicsPort];
-        CGContextSetRGBFillColor(graphicsContext, 0.0f, 0.0f, 0.0f, 1.0f);
+        CGContextSetFillColorWithColor(graphicsContext, CGColorGetConstantColor(kCGColorBlack));
         CGContextFillRect(graphicsContext, [self bounds]);
+        CGContextSetAllowsAntialiasing(graphicsContext, false);
     }
 }
 
 - (void)drawRect:(NSRect)dirtyRect
 {
+    CGContextSetFillColorWithColor(graphicsContext, CGColorGetConstantColor(kCGColorBlack));
+    CGContextFillRect(graphicsContext, [self bounds]);
+    CGContextSetFillColorWithColor(graphicsContext, CGColorGetConstantColor(kCGColorWhite));
+    CGContextFillEllipseInRect(graphicsContext, [self bounds]);
     if (graphicsContext && appHandlers && appHandlers->render_handler)
         appHandlers->render_handler((void*)&params, &((PebbleRenderEvent) { .window = NULL, .ctx = ctx }));
-}
-
-- (IBAction)upButtonClick:(id)sender
-{
-    //if ([windowStack count] > 0)
-        ((ClickConfig**)window_stack_get_top_window()->click_config_context)[BUTTON_ID_UP]->click.handler(NULL, NULL);
-}
-
-- (IBAction)selectButtonClick:(id)sender
-{
-    //if ([windowStack count] > 0)
-        ((ClickConfig**)window_stack_get_top_window()->click_config_context)[BUTTON_ID_SELECT]->click.handler(NULL, NULL);
-}
-
-- (IBAction)downButtonClick:(id)sender
-{
-    //if ([windowStack count] > 0)
-        ((ClickConfig**)window_stack_get_top_window()->click_config_context)[BUTTON_ID_DOWN]->click.handler(NULL, NULL);
 }
 
 @end

@@ -12,19 +12,24 @@
 #include <CoreGraphics/CoreGraphics.h>
 #include "pebble_os.h"
 
-//NSCalendar * gregorian;
-//NSTimeZone * tzone;
-//NSPointerArray * windowStack;
-
-struct GContext {
+typedef struct _SimulatorGContext {
     CGContextRef coreGraphicsContext;
     GCompOp compositingMode;
-};
+} SimulatorGContext;
 
-typedef struct SimulatorParams
+typedef struct _SimulatorParams
 {
-    void (*setGraphicsContext)(GContext * context);
+    void (*setGraphicsContext)(SimulatorGContext * context);
     void (*setAppHandlers)(PebbleAppHandlers * handlers);
     void (*setWindowStack)(CFMutableArrayRef windowStack);
+    CFMutableDictionaryRef (*requestResourceManifest)(void);
+    void (*setclickConfigs)(ClickConfig** clickConfigs);
     PebbleAppHandlers * handlers;
+    CFRunLoopRef runLoop;
 } SimulatorParams;
+
+typedef struct _ClickRecognizer
+{
+    ButtonId buttonID;
+    uint8_t clickCount;
+} ClickRecognizer;

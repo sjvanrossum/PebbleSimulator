@@ -18,6 +18,22 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     // Insert code here to initialize your application
+    windowController = [SRSimulatorWindowController sharedController];
+    [windowController showWindow:self];
+}
+
+- (void)openPebbleApplication:(id)sender
+{
+    NSOpenPanel * openPanel = [NSOpenPanel openPanel];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setCanCreateDirectories:NO];
+    if ([openPanel runModal] == NSFileHandlingPanelOKButton)
+    {
+        [windowController showWindow:self];
+        [windowController runPebbleApplicationAtURL:[openPanel URL]];
+    }
 }
 
 @end

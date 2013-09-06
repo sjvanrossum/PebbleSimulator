@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EA29D8AF17D5D77B00839929 /* SimulatorWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA29D8AE17D5D77B00839929 /* SimulatorWindow.xib */; };
+		EA29D8B217D5D7CF00839929 /* SRSimulatorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA29D8B117D5D7CF00839929 /* SRSimulatorWindowController.m */; };
+		EA29D8B517D5DD6300839929 /* SRPebbleApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = EA29D8B417D5DD6300839929 /* SRPebbleApplication.m */; };
 		EA3E3227171C28D800A0BD25 /* pebble_app_info.h in Headers */ = {isa = PBXBuildFile; fileRef = EA3E3222171C28D800A0BD25 /* pebble_app_info.h */; };
 		EA3E3228171C28D800A0BD25 /* pebble_app.h in Headers */ = {isa = PBXBuildFile; fileRef = EA3E3223171C28D800A0BD25 /* pebble_app.h */; };
 		EA3E3229171C28D800A0BD25 /* pebble_fonts.h in Headers */ = {isa = PBXBuildFile; fileRef = EA3E3224171C28D800A0BD25 /* pebble_fonts.h */; };
@@ -20,11 +23,16 @@
 		EA3F7BE21719D926001BD65B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA3F7BE01719D926001BD65B /* MainMenu.xib */; };
 		EA3F7C14171ADE1D001BD65B /* SRPebbleSimView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3F7C13171ADE1D001BD65B /* SRPebbleSimView.m */; };
 		EA3F7C16171AE4DF001BD65B /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA3F7C15171AE4DF001BD65B /* CoreGraphics.framework */; };
-		EA3F7C19171B581F001BD65B /* SRPebbleWindowView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3F7C18171B581F001BD65B /* SRPebbleWindowView.m */; };
 		EA3F7C45171C1CED001BD65B /* pebble_os.c in Sources */ = {isa = PBXBuildFile; fileRef = EA3F7BE81719D94E001BD65B /* pebble_os.c */; };
 		EA3F7C47171C1CFA001BD65B /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA3F7C46171C1CFA001BD65B /* CoreFoundation.framework */; };
 		EA3F7C48171C1D03001BD65B /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA3F7C15171AE4DF001BD65B /* CoreGraphics.framework */; };
 		EA3F7C4B171C1D2E001BD65B /* libpebblesim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA3F7C3E171C1C2F001BD65B /* libpebblesim.a */; };
+		EA70441717BCD0F500C04FF9 /* SRPebbleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = EA70441617BCD0F500C04FF9 /* SRPebbleButton.m */; };
+		EAC2CF8F17D14CB600313F9D /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAC2CF8E17D14CB600313F9D /* Preferences.xib */; };
+		EAC2CF9317D1D7FD00313F9D /* Settings-Display.png in Resources */ = {isa = PBXBuildFile; fileRef = EAC2CF9017D1D7FD00313F9D /* Settings-Display.png */; };
+		EAC2CF9417D1D7FD00313F9D /* Settings-About.png in Resources */ = {isa = PBXBuildFile; fileRef = EAC2CF9117D1D7FD00313F9D /* Settings-About.png */; };
+		EAC2CF9517D1D7FD00313F9D /* Settings-Bluetooth.png in Resources */ = {isa = PBXBuildFile; fileRef = EAC2CF9217D1D7FD00313F9D /* Settings-Bluetooth.png */; };
+		EAC2CF9717D1DA0B00313F9D /* Settings-DateTime.png in Resources */ = {isa = PBXBuildFile; fileRef = EAC2CF9617D1DA0B00313F9D /* Settings-DateTime.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +60,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EA29D8AE17D5D77B00839929 /* SimulatorWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SimulatorWindow.xib; sourceTree = "<group>"; };
+		EA29D8B017D5D7CE00839929 /* SRSimulatorWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSimulatorWindowController.h; path = ../SRSimulatorWindowController.h; sourceTree = "<group>"; };
+		EA29D8B117D5D7CF00839929 /* SRSimulatorWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSimulatorWindowController.m; path = ../SRSimulatorWindowController.m; sourceTree = "<group>"; };
+		EA29D8B317D5DD6300839929 /* SRPebbleApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRPebbleApplication.h; path = ../SRPebbleApplication.h; sourceTree = "<group>"; };
+		EA29D8B417D5DD6300839929 /* SRPebbleApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRPebbleApplication.m; path = ../SRPebbleApplication.m; sourceTree = "<group>"; };
 		EA3E3222171C28D800A0BD25 /* pebble_app_info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pebble_app_info.h; sourceTree = "<group>"; };
 		EA3E3223171C28D800A0BD25 /* pebble_app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pebble_app.h; sourceTree = "<group>"; };
 		EA3E3224171C28D800A0BD25 /* pebble_fonts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pebble_fonts.h; sourceTree = "<group>"; };
@@ -74,11 +87,16 @@
 		EA3F7C12171ADE1D001BD65B /* SRPebbleSimView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRPebbleSimView.h; sourceTree = "<group>"; };
 		EA3F7C13171ADE1D001BD65B /* SRPebbleSimView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRPebbleSimView.m; sourceTree = "<group>"; };
 		EA3F7C15171AE4DF001BD65B /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		EA3F7C17171B581F001BD65B /* SRPebbleWindowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRPebbleWindowView.h; sourceTree = "<group>"; };
-		EA3F7C18171B581F001BD65B /* SRPebbleWindowView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRPebbleWindowView.m; sourceTree = "<group>"; };
 		EA3F7C3E171C1C2F001BD65B /* libpebblesim.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpebblesim.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA3F7C46171C1CFA001BD65B /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		EA3F7C5C171C1F21001BD65B /* helloworld.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = helloworld.xcodeproj; path = helloworld/helloworld.xcodeproj; sourceTree = "<group>"; };
+		EA70441517BCD0F500C04FF9 /* SRPebbleButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRPebbleButton.h; sourceTree = "<group>"; };
+		EA70441617BCD0F500C04FF9 /* SRPebbleButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRPebbleButton.m; sourceTree = "<group>"; };
+		EAC2CF8E17D14CB600313F9D /* Preferences.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
+		EAC2CF9017D1D7FD00313F9D /* Settings-Display.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Settings-Display.png"; sourceTree = "<group>"; };
+		EAC2CF9117D1D7FD00313F9D /* Settings-About.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Settings-About.png"; sourceTree = "<group>"; };
+		EAC2CF9217D1D7FD00313F9D /* Settings-Bluetooth.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Settings-Bluetooth.png"; sourceTree = "<group>"; };
+		EAC2CF9617D1DA0B00313F9D /* Settings-DateTime.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Settings-DateTime.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,11 +166,12 @@
 		EA3F7BD11719D926001BD65B /* PebbleSimulator */ = {
 			isa = PBXGroup;
 			children = (
+				EAC2CF9817D1DB9800313F9D /* Resources */,
 				EA3F7C11171A2566001BD65B /* Pebble Simulator Headers */,
 				EA3F7BEF1719D97F001BD65B /* Pebble Simulator Implementations */,
 				EA3F7BDD1719D926001BD65B /* SRAppDelegate.h */,
 				EA3F7BDE1719D926001BD65B /* SRAppDelegate.m */,
-				EA3F7BE01719D926001BD65B /* MainMenu.xib */,
+				EAC2CF8D17D14C8000313F9D /* XIBs */,
 				EA3F7BD21719D926001BD65B /* Supporting Files */,
 			);
 			path = PebbleSimulator;
@@ -173,7 +192,9 @@
 		EA3F7BEF1719D97F001BD65B /* Pebble Simulator Implementations */ = {
 			isa = PBXGroup;
 			children = (
-				EA3F7C18171B581F001BD65B /* SRPebbleWindowView.m */,
+				EA29D8B417D5DD6300839929 /* SRPebbleApplication.m */,
+				EA29D8B117D5D7CF00839929 /* SRSimulatorWindowController.m */,
+				EA70441617BCD0F500C04FF9 /* SRPebbleButton.m */,
 				EA3F7C13171ADE1D001BD65B /* SRPebbleSimView.m */,
 			);
 			name = "Pebble Simulator Implementations";
@@ -182,7 +203,9 @@
 		EA3F7C11171A2566001BD65B /* Pebble Simulator Headers */ = {
 			isa = PBXGroup;
 			children = (
-				EA3F7C17171B581F001BD65B /* SRPebbleWindowView.h */,
+				EA29D8B317D5DD6300839929 /* SRPebbleApplication.h */,
+				EA29D8B017D5D7CE00839929 /* SRSimulatorWindowController.h */,
+				EA70441517BCD0F500C04FF9 /* SRPebbleButton.h */,
 				EA3F7C12171ADE1D001BD65B /* SRPebbleSimView.h */,
 			);
 			name = "Pebble Simulator Headers";
@@ -224,6 +247,28 @@
 				EA3F7C61171C1F22001BD65B /* libhelloworld.dylib */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		EAC2CF8D17D14C8000313F9D /* XIBs */ = {
+			isa = PBXGroup;
+			children = (
+				EA3F7BE01719D926001BD65B /* MainMenu.xib */,
+				EAC2CF8E17D14CB600313F9D /* Preferences.xib */,
+				EA29D8AE17D5D77B00839929 /* SimulatorWindow.xib */,
+			);
+			name = XIBs;
+			path = ..;
+			sourceTree = "<group>";
+		};
+		EAC2CF9817D1DB9800313F9D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				EAC2CF9617D1DA0B00313F9D /* Settings-DateTime.png */,
+				EAC2CF9017D1D7FD00313F9D /* Settings-Display.png */,
+				EAC2CF9117D1D7FD00313F9D /* Settings-About.png */,
+				EAC2CF9217D1D7FD00313F9D /* Settings-Bluetooth.png */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -332,6 +377,12 @@
 				EA3F7BD61719D926001BD65B /* InfoPlist.strings in Resources */,
 				EA3F7BDC1719D926001BD65B /* Credits.rtf in Resources */,
 				EA3F7BE21719D926001BD65B /* MainMenu.xib in Resources */,
+				EAC2CF8F17D14CB600313F9D /* Preferences.xib in Resources */,
+				EAC2CF9317D1D7FD00313F9D /* Settings-Display.png in Resources */,
+				EAC2CF9417D1D7FD00313F9D /* Settings-About.png in Resources */,
+				EAC2CF9517D1D7FD00313F9D /* Settings-Bluetooth.png in Resources */,
+				EAC2CF9717D1DA0B00313F9D /* Settings-DateTime.png in Resources */,
+				EA29D8AF17D5D77B00839929 /* SimulatorWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -345,7 +396,9 @@
 				EA3F7BD81719D926001BD65B /* main.m in Sources */,
 				EA3F7BDF1719D926001BD65B /* SRAppDelegate.m in Sources */,
 				EA3F7C14171ADE1D001BD65B /* SRPebbleSimView.m in Sources */,
-				EA3F7C19171B581F001BD65B /* SRPebbleWindowView.m in Sources */,
+				EA70441717BCD0F500C04FF9 /* SRPebbleButton.m in Sources */,
+				EA29D8B217D5D7CF00839929 /* SRSimulatorWindowController.m in Sources */,
+				EA29D8B517D5DD6300839929 /* SRPebbleApplication.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -395,6 +448,7 @@
 				EA3F7BE11719D926001BD65B /* en */,
 			);
 			name = MainMenu.xib;
+			path = PebbleSimulator;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

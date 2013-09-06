@@ -11,27 +11,8 @@
 #import "pebble_sim.h"
 
 @interface SRPebbleSimView : NSView
-{
-    CGColorRef clear;
-    CGColorRef black;
-    CGColorRef white;
-    
-    void * dlhandle;
-    void (*pbl_main)(void * params);
-}
 
 void setAppHandlers(PebbleAppHandlers * handlers);
-void setGraphicsContext(GContext * context);
-
-- (IBAction)upButtonClick:(id)sender;
-- (IBAction)selectButtonClick:(id)sender;
-- (IBAction)downButtonClick:(id)sender;
-- (void)awakePebbleApp;
-
-
-@property (assign) IBOutlet NSButton * upButton;
-@property (assign) IBOutlet NSButton * downButton;
-@property (assign) IBOutlet NSButton * selectButton;
-@property (assign) IBOutlet NSButton * backButton;
+void setGraphicsContext(SimulatorGContext * context);
 
 @end

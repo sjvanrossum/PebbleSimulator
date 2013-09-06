@@ -12,7 +12,6 @@
 //    Considering standard C and POSIX or C++11 core structures.
 //  - 
 
-#include "pebble_os.h"
 #include "pebble_sim.h"
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreGraphics/CoreGraphics.h>
@@ -21,7 +20,16 @@
 
 PblTm pblNow;
 
-GContext gCtx = (GContext) { NULL };
+FILE * resourcepack = NULL;
+SimulatorGContext gCtx = (SimulatorGContext) { NULL, NULL };
+
+ClickConfig backConfig;
+ClickConfig upConfig;
+ClickConfig selectConfig;
+ClickConfig downConfig;
+
+uint32_t uptime_ms = 0;
+
 CFMutableArrayRef windowStack;
 CFMutableDictionaryRef animationCollection;
 CFMutableDictionaryRef appTimers;
@@ -35,77 +43,106 @@ void app_callback_loop(CFRunLoopTimerRef timer, void * info);
 void animation_init(struct Animation *animation)
 {
     // TODO: verify.
-    *animation = (Animation)
+    if (animation)
     {
-        .list_node = (ListNode)
+        *animation = (Animation)
         {
-            .prev = NULL,
-            .next = NULL
-        },
-        .implementation = NULL,
-        .handlers = (AnimationHandlers)
-        {
-            .started = NULL,
-            .stopped = NULL
-        },
-        .context = NULL,
-        .abs_start_time_ms = 0,
-        .delay_ms = 0,
-        .duration_ms = 250,
-        .curve = AnimationCurveEaseInOut,
-        .is_completed = false
-    };
+            .list_node = (ListNode)
+            {
+                .prev = NULL,
+                .next = NULL
+            },
+            .implementation = NULL,
+            .handlers = (AnimationHandlers)
+            {
+                .started = NULL,
+                .stopped = NULL
+            },
+            .context = NULL,
+            .abs_start_time_ms = 0,
+            .delay_ms = 0,
+            .duration_ms = 250,
+            .curve = AnimationCurveEaseInOut,
+            .is_completed = false
+        };
+    }
 }
 
 void animation_set_delay(struct Animation *animation, uint32_t delay_ms)
 {
     // TODO: verify.
-    animation->delay_ms = delay_ms;
+    if (animation)
+    {
+        animation->delay_ms = delay_ms;
+    }
 }
 
 void animation_set_duration(struct Animation *animation, uint32_t duration_ms)
 {
     // TODO: verify.
-    animation->duration_ms = duration_ms;
+    if (animation)
+    {
+        animation->duration_ms = duration_ms;
+    }
 }
 
 void animation_set_curve(struct Animation *animation, AnimationCurve curve)
 {
     // TODO: verify.
-    animation->curve = curve;
+    if (animation)
+    {
+        animation->curve = curve;
+    }
 }
 
 void animation_set_handlers(struct Animation *animation, AnimationHandlers callbacks, void *context)
 {
     // TODO: verify.
-    animation->handlers = callbacks;
-    animation->context = context;
+    if (animation)
+    {
+        animation->handlers = callbacks;
+        animation->context = context;
+    }
 }
 
 void animation_set_implementation(struct Animation *animation, const AnimationImplementation *implementation)
 {
     // TODO: verify.
-    animation->implementation = implementation;
+    if (animation)
+    {
+        animation->implementation = implementation;
+    }
 }
 
 void *animation_get_context(struct Animation *animation)
 {
     // TODO: verify.
-    return animation->context;
+    if (animation)
+    {
+        return animation->context;
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 void animation_schedule(struct Animation *animation)
 {
     // TODO: verify.
-    if (CFDictionaryContainsKey(animationCollection, animation))
+    if (animation)
     {
-        animation_unschedule(animation);
+        if (CFDictionaryContainsKey(animationCollection, animation))
+        {
+            animation_unschedule(animation);
+        }
+        
+        animation->abs_start_time_ms = uptime_ms;
+        animation->implementation->setup(animation);
+        animation->handlers.started(animation, animation->context);
+        uint32_t total_duration = animation->duration_ms + animation->delay_ms;
+        CFDictionaryAddValue(animationCollection, animation, CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &total_duration));
     }
-    
-    animation->implementation->setup(animation);
-    animation->handlers.started(animation, animation->context);
-    uint32_t total_duration = animation->duration_ms + animation->delay_ms;
-    CFDictionaryAddValue(animationCollection, animation, CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &total_duration));
 }
 
 void animation_unschedule(struct Animation *animation)
@@ -116,6 +153,7 @@ void animation_unschedule(struct Animation *animation)
         CFDictionaryRemoveValue(animationCollection, animation);
         animation->handlers.stopped(animation, animation->is_completed, animation->context);
         animation->implementation->teardown(animation);
+        animation->abs_start_time_ms = 0;
     }
 }
 
@@ -128,7 +166,14 @@ void animation_unschedule_all(void)
 bool animation_is_scheduled(struct Animation *animation)
 {
     // TODO: verify.
-    return (bool)CFDictionaryContainsKey(animationCollection, animation);
+    if (animation)
+    {
+        return (bool)CFDictionaryContainsKey(animationCollection, animation);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 AppTimerHandle app_timer_send_event(AppContextRef app_ctx, uint32_t timeout_ms, uint32_t cookie)
@@ -147,8 +192,10 @@ bool app_timer_cancel_event(AppContextRef app_ctx_ref, AppTimerHandle handle)
     // TODO: verify.
     CFNumberRef key = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &handle);
     bool exists = CFDictionaryContainsValue(appTimers, key);
+    
     if (exists)
         CFDictionaryRemoveValue(appTimers, key);
+    
     CFRelease(key);
     return exists;
 }
@@ -170,6 +217,7 @@ void animation_update_applier(const void *key, const void *value, void *context)
     CFNumberGetValue(total_duration_ms, kCFNumberIntType, &total_duration_ms_val);
     ++total_duration_ms_val;
     CFDictionaryReplaceValue(animationCollection, key, CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &total_duration_ms_val));
+    
     if (total_duration_ms_val >= animation->delay_ms)
     {
         if (total_duration_ms_val >= animation->delay_ms + animation->duration_ms)
@@ -205,38 +253,43 @@ void app_callback_loop(CFRunLoopTimerRef timer, void * info)
 {
     // TODO: verify.
     SimulatorParams * app_task_ctx = (SimulatorParams *)info;
-    PebbleAppHandlers * handlers = app_task_ctx->handlers;
     
-    CFDictionaryApplyFunction(animationCollection, &animation_update_applier, app_task_ctx);
-    
-    if (handlers->timer_handler)
+    if (app_task_ctx)
     {
-        CFDictionaryApplyFunction(appTimers, &app_timer_applier, app_task_ctx);
-    }
-    
-    PblTm itmPblNow;
-    get_time(&itmPblNow);
-    if (handlers->tick_info.tick_handler)
-    {
-        TimeUnits flags = handlers->tick_info.tick_units;
-        TimeUnits units_changed = 0;
-        if (flags & YEAR_UNIT && itmPblNow.tm_year != pblNow.tm_year)
-            units_changed |= YEAR_UNIT;
-        if (flags & MONTH_UNIT && itmPblNow.tm_mon != pblNow.tm_mon)
-            units_changed |= MONTH_UNIT;
-        if (flags & DAY_UNIT && itmPblNow.tm_mday != pblNow.tm_mday)
-            units_changed |= DAY_UNIT;
-        if (flags & HOUR_UNIT && itmPblNow.tm_hour != pblNow.tm_hour)
-            units_changed |= HOUR_UNIT;
-        if (flags & MINUTE_UNIT && itmPblNow.tm_min != pblNow.tm_min)
-            units_changed |= MINUTE_UNIT;
-        if (flags & SECOND_UNIT && itmPblNow.tm_sec != pblNow.tm_sec)
-            units_changed |= SECOND_UNIT;
+        PebbleAppHandlers * handlers = app_task_ctx->handlers;
         
-        if (units_changed != 0)
-            handlers->tick_info.tick_handler(app_task_ctx, &((PebbleTickEvent) { .tick_time = &itmPblNow, .units_changed = units_changed }));
+        CFDictionaryApplyFunction(animationCollection, &animation_update_applier, app_task_ctx);
+        
+        if (handlers->timer_handler)
+        {
+            CFDictionaryApplyFunction(appTimers, &app_timer_applier, app_task_ctx);
+        }
+        
+        PblTm itmPblNow;
+        get_time(&itmPblNow);
+        if (handlers->tick_info.tick_handler)
+        {
+            TimeUnits flags = handlers->tick_info.tick_units;
+            TimeUnits units_changed = 0;
+            if (flags & YEAR_UNIT && itmPblNow.tm_year != pblNow.tm_year)
+                units_changed |= YEAR_UNIT;
+            if (flags & MONTH_UNIT && itmPblNow.tm_mon != pblNow.tm_mon)
+                units_changed |= MONTH_UNIT;
+            if (flags & DAY_UNIT && itmPblNow.tm_mday != pblNow.tm_mday)
+                units_changed |= DAY_UNIT;
+            if (flags & HOUR_UNIT && itmPblNow.tm_hour != pblNow.tm_hour)
+                units_changed |= HOUR_UNIT;
+            if (flags & MINUTE_UNIT && itmPblNow.tm_min != pblNow.tm_min)
+                units_changed |= MINUTE_UNIT;
+            if (flags & SECOND_UNIT && itmPblNow.tm_sec != pblNow.tm_sec)
+                units_changed |= SECOND_UNIT;
+            
+            if (units_changed != 0)
+                handlers->tick_info.tick_handler(app_task_ctx, &((PebbleTickEvent) { .tick_time = &itmPblNow, .units_changed = units_changed }));
+        }
+        pblNow = itmPblNow;
     }
-    pblNow = itmPblNow;
+    ++uptime_ms;
 }
 
 void app_event_loop(AppTaskContextRef app_task_ctx, PebbleAppHandlers *handlers)
@@ -244,11 +297,16 @@ void app_event_loop(AppTaskContextRef app_task_ctx, PebbleAppHandlers *handlers)
     // TODO: verify.
     // VERY IMPORTANT.
     SimulatorParams * app_params = (SimulatorParams *)app_task_ctx;
-    app_params->setGraphicsContext(&gCtx);
-    app_params->handlers = handlers;
+    if (app_params)
+    {
+        app_params->setGraphicsContext(&gCtx);
+        app_params->handlers = handlers;
+    }
     
     animationCollection = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
     appTimers = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
+    
+    //CFRunLoopSourceRef graphicsSource = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, 0);
     
     get_time(&pblNow);
     CFRunLoopTimerRef timer = CFRunLoopTimerCreate(kCFAllocatorDefault, CFAbsoluteTimeGetCurrent(), 1.0/1000.0, 0, 0, &app_callback_loop, &((CFRunLoopTimerContext){ .info = app_params }));
@@ -305,13 +363,13 @@ void graphics_context_set_stroke_color(GContext *ctx, GColor color)
     switch (color)
     {
         case GColorClear:
-            CGContextSetRGBStrokeColor(ctx->coreGraphicsContext, 0.0f, 0.0f, 0.0f, 0.0f);
+            CGContextSetRGBStrokeColor(((SimulatorGContext *)ctx)->coreGraphicsContext, 0.0f, 0.0f, 0.0f, 0.0f);
             break;
         case GColorBlack:
-            CGContextSetRGBStrokeColor(ctx->coreGraphicsContext, 0.0f, 0.0f, 0.0f, 1.0f);
+            CGContextSetRGBStrokeColor(((SimulatorGContext *)ctx)->coreGraphicsContext, 0.0f, 0.0f, 0.0f, 1.0f);
             break;
         case GColorWhite:
-            CGContextSetRGBStrokeColor(ctx->coreGraphicsContext, 1.0f, 1.0f, 1.0f, 1.0f);
+            CGContextSetRGBStrokeColor(((SimulatorGContext *)ctx)->coreGraphicsContext, 1.0f, 1.0f, 1.0f, 1.0f);
             break;
         default:
             // Just do it, can't touch this.
@@ -325,13 +383,13 @@ void graphics_context_set_fill_color(GContext *ctx, GColor color)
     switch (color)
     {
         case GColorClear:
-            CGContextSetRGBFillColor(ctx->coreGraphicsContext, 0.0f, 0.0f, 0.0f, 0.0f);
+            CGContextSetRGBFillColor(((SimulatorGContext *)ctx)->coreGraphicsContext, 0.0f, 0.0f, 0.0f, 0.0f);
             break;
         case GColorBlack:
-            CGContextSetRGBFillColor(ctx->coreGraphicsContext, 0.0f, 0.0f, 0.0f, 1.0f);
+            CGContextSetRGBFillColor(((SimulatorGContext *)ctx)->coreGraphicsContext, 0.0f, 0.0f, 0.0f, 1.0f);
             break;
         case GColorWhite:
-            CGContextSetRGBFillColor(ctx->coreGraphicsContext, 1.0f, 1.0f, 1.0f, 1.0f);
+            CGContextSetRGBFillColor(((SimulatorGContext *)ctx)->coreGraphicsContext, 1.0f, 1.0f, 1.0f, 1.0f);
             break;
         default:
             // Just do it, can't touch this.
@@ -348,26 +406,26 @@ void graphics_context_set_text_color(GContext *ctx, GColor color)
 void graphics_context_set_compositing_mode(GContext *ctx, GCompOp mode)
 {
     // TODO: verify.
-    ctx->compositingMode = mode;
+    ((SimulatorGContext *)ctx)->compositingMode = mode;
 }
 
 void graphics_draw_pixel(GContext *ctx, GPoint point)
 {
     // TODO: verify.
-    CGContextFillRect(ctx->coreGraphicsContext, CGRectMake(point.x, point.y, 1.0f, 1.0f));
+    CGContextFillRect(((SimulatorGContext *)ctx)->coreGraphicsContext, CGRectMake(point.x, point.y, 1.0f, 1.0f));
 }
 
 void graphics_draw_line(GContext *ctx, GPoint p0, GPoint p1)
 {
     // TODO: verify.
-    CGContextStrokeLineSegments(ctx->coreGraphicsContext, (CGPoint[]) { CGPointMake((CGFloat)p0.x, (CGFloat)p0.y), CGPointMake((CGFloat)p1.x, (CGFloat)p1.y) }, 2);
+    CGContextStrokeLineSegments(((SimulatorGContext *)ctx)->coreGraphicsContext, (CGPoint[]) { CGPointMake((CGFloat)p0.x, (CGFloat)p0.y), CGPointMake((CGFloat)p1.x, (CGFloat)p1.y) }, 2);
 }
 
 void graphics_fill_rect(GContext *ctx, GRect rect, uint8_t corner_radius, GCornerMask corner_mask)
 {
     // TODO: verify.
     
-    CGContextFillRect(ctx->coreGraphicsContext, CGRectMake((CGFloat)rect.origin.x, (CGFloat)rect.origin.y, (CGFloat)rect.size.w, (CGFloat)rect.size.h));
+    CGContextFillRect(((SimulatorGContext *)ctx)->coreGraphicsContext, CGRectMake((CGFloat)rect.origin.x, (CGFloat)rect.origin.y, (CGFloat)rect.size.w, (CGFloat)rect.size.h));
     return;
     
     // TODO: fix rounded.
@@ -382,21 +440,21 @@ void graphics_fill_rect(GContext *ctx, GRect rect, uint8_t corner_radius, GCorne
     CGPathAddLineToPoint(path, &transform, (CGFloat)corner_radius, (CGFloat)rect.size.h);
     CGPathAddArcToPoint(path, &transform, 0.0f, (CGFloat)rect.size.h, 0.0f, (CGFloat)rect.size.h - (CGFloat)corner_radius, (CGFloat)corner_radius);
     CGPathCloseSubpath(path);
-    CGContextAddPath(ctx->coreGraphicsContext, path);
-    CGContextDrawPath(ctx->coreGraphicsContext, kCGPathStroke);
+    CGContextAddPath(((SimulatorGContext *)ctx)->coreGraphicsContext, path);
+    CGContextDrawPath(((SimulatorGContext *)ctx)->coreGraphicsContext, kCGPathStroke);
     CGPathRelease(path);
 }
 
 void graphics_draw_circle(GContext *ctx, GPoint p, int radius)
 {
     // TODO: verify.
-    CGContextStrokeEllipseInRect(ctx->coreGraphicsContext, CGRectMake(p.x, p.y, radius, radius));
+    CGContextStrokeEllipseInRect(((SimulatorGContext *)ctx)->coreGraphicsContext, CGRectMake(p.x, p.y, radius, radius));
 }
 
 void graphics_fill_circle(GContext *ctx, GPoint p, int radius)
 {
     // TODO: verify.
-    CGContextFillEllipseInRect(ctx->coreGraphicsContext, CGRectMake(p.x, p.y, radius, radius));
+    CGContextFillEllipseInRect(((SimulatorGContext *)ctx)->coreGraphicsContext, CGRectMake(p.x, p.y, radius, radius));
 
 }
 
@@ -414,8 +472,8 @@ void graphics_draw_round_rect(GContext *ctx, GRect rect, int radius)
     CGPathAddLineToPoint(path, &transform, (CGFloat)radius, (CGFloat)rect.size.h);
     CGPathAddArcToPoint(path, &transform, 0.0f, (CGFloat)rect.size.h, 0.0f, (CGFloat)rect.size.h - (CGFloat)radius, (CGFloat)radius);
     CGPathCloseSubpath(path);
-    CGContextAddPath(ctx->coreGraphicsContext, path);
-    CGContextDrawPath(ctx->coreGraphicsContext, kCGPathStroke);
+    CGContextAddPath(((SimulatorGContext *)ctx)->coreGraphicsContext, path);
+    CGContextDrawPath(((SimulatorGContext *)ctx)->coreGraphicsContext, kCGPathStroke);
     CGPathRelease(path);
 }
 
@@ -474,8 +532,8 @@ void gpath_draw_outline(GContext *ctx, GPath *path)
     CGPathAddLines(corePath, &transform, points, path->num_points);
     CGPathCloseSubpath(corePath);
     
-    CGContextAddPath(ctx->coreGraphicsContext, corePath);
-    CGContextDrawPath(ctx->coreGraphicsContext, kCGPathStroke);
+    CGContextAddPath(((SimulatorGContext *)ctx)->coreGraphicsContext, corePath);
+    CGContextDrawPath(((SimulatorGContext *)ctx)->coreGraphicsContext, kCGPathStroke);
     CGPathRelease(corePath);
 }
 
@@ -493,8 +551,8 @@ void gpath_draw_filled(GContext *ctx, GPath *path)
     CGPathAddLines(corePath, &transform, points, path->num_points);
     CGPathCloseSubpath(corePath);
     
-    CGContextAddPath(ctx->coreGraphicsContext, corePath);
-    CGContextDrawPath(ctx->coreGraphicsContext, kCGPathFill);
+    CGContextAddPath(((SimulatorGContext *)ctx)->coreGraphicsContext, corePath);
+    CGContextDrawPath(((SimulatorGContext *)ctx)->coreGraphicsContext, kCGPathFill);
     CGPathRelease(corePath);
 }
 
@@ -507,13 +565,16 @@ GPoint grect_center_point(GRect *rect)
 void layer_mark_dirty(Layer *layer)
 {
     // TODO: verify.
-    layer->update_proc(layer, &gCtx);
-    Layer * childLayer = layer->first_child;
-    do
+    if (layer)
     {
-        layer_mark_dirty(childLayer);
+        layer->update_proc(layer, &gCtx);
+        Layer * childLayer = layer->first_child;
+        while (childLayer)
+        {
+            layer_mark_dirty(childLayer);
+            childLayer = childLayer->next_sibling;
+        }
     }
-    while ((childLayer = childLayer->next_sibling));
 }
 
 void layer_remove_from_parent(Layer *child)
@@ -652,32 +713,34 @@ size_t resource_size(ResHandle h)
 
 void rotbmp_deinit_container(RotBmpContainer *c)
 {
-    // TODO: free.
+    // TODO: no implementation, deprecated.
 }
 
 bool rotbmp_init_container(int resource_id, RotBmpContainer *c)
 {
-    // TODO: malloc/init.
+    // TODO: no implementation, deprecated.
+    return false;
 }
 
 void rotbmp_pair_deinit_container(RotBmpPairContainer *c)
 {
-    // TODO: free.
+    // TODO: no implementation, deprecated.
 }
 
 bool rotbmp_pair_init_container(int white_resource_id, int black_resource_id, RotBmpPairContainer *c)
 {
-    // TODO: malloc/init.
+    // TODO: no implementation, deprecated.
+    return false;
 }
 
 void rotbmp_pair_layer_set_src_ic(RotBmpPairLayer *pair, GPoint ic)
 {
-    // TODO: figure it out.
+    // TODO: no implementation, deprecated.
 }
 
 void rotbmp_pair_layer_set_angle(RotBmpPairLayer *pair, int32_t angle)
 {
-    // TODO: figure it out.
+    // TODO: no implementation, deprecated.
 }
 
 void window_init(Window *window, const char *debug_name)
@@ -697,116 +760,37 @@ void window_init(Window *window, const char *debug_name)
         },
         .window_handlers = (WindowHandlers) { NULL, NULL, NULL, NULL },
         .click_config_provider = NULL,
-        .click_config_context = malloc(sizeof(ClickConfig*)*NUM_BUTTONS),
+        .click_config_context = NULL,
         .user_data = NULL,
         .debug_name = debug_name,
-    };
-    
-    ((ClickConfig**)window->click_config_context)[BUTTON_ID_UP] = malloc(sizeof(ClickConfig));
-    *((ClickConfig**)window->click_config_context)[BUTTON_ID_UP] = (ClickConfig)
-    {
-        .context = NULL,
-        .click =
-        {
-            .handler = NULL,
-            .repeat_interval_ms = 0
-        },
-        .multi_click =
-        {
-            .min = 0,
-            .max = 0,
-            .last_click_only = 0,
-            .handler = NULL,
-            .timeout = 0
-        },
-        .long_click =
-        {
-            .delay_ms = 0,
-            .handler = NULL,
-            .release_handler = NULL
-        },
-        .raw =
-        {
-            .up_handler = NULL,
-            .down_handler = NULL,
-            .context = NULL
-        }
-    };
-    
-    ((ClickConfig**)window->click_config_context)[BUTTON_ID_SELECT] = malloc(sizeof(ClickConfig));
-    *((ClickConfig**)window->click_config_context)[BUTTON_ID_SELECT] = (ClickConfig)
-    {
-        .context = NULL,
-        .click =
-        {
-            .handler = NULL,
-            .repeat_interval_ms = 0
-        },
-        .multi_click =
-        {
-            .min = 0,
-            .max = 0,
-            .last_click_only = 0,
-            .handler = NULL,
-            .timeout = 0
-        },
-        .long_click =
-        {
-            .delay_ms = 0,
-            .handler = NULL,
-            .release_handler = NULL
-        },
-        .raw =
-        {
-            .up_handler = NULL,
-            .down_handler = NULL,
-            .context = NULL
-        }
-    };
-    
-    ((ClickConfig**)window->click_config_context)[BUTTON_ID_DOWN] = malloc(sizeof(ClickConfig));
-    *((ClickConfig**)window->click_config_context)[BUTTON_ID_DOWN] = (ClickConfig)
-    {
-        .context = NULL,
-        .click =
-        {
-            .handler = NULL,
-            .repeat_interval_ms = 0
-        },
-        .multi_click =
-        {
-            .min = 0,
-            .max = 0,
-            .last_click_only = 0,
-            .handler = NULL,
-            .timeout = 0
-        },
-        .long_click =
-        {
-            .delay_ms = 0,
-            .handler = NULL,
-            .release_handler = NULL
-        },
-        .raw =
-        {
-            .up_handler = NULL,
-            .down_handler = NULL,
-            .context = NULL
-        }
     };
 }
 
 void window_stack_push(Window *window, bool animated)
 {
     // TODO: verify.
-    CFArrayAppendValue(windowStack, window);
+    if (window)
+    {
+        Window * top = window_stack_get_top_window();
+        
+        if (top)
+            top->on_screen = false;
+        
+        CFArrayAppendValue(windowStack, window);
+        window->on_screen = true;
+        
+        if (window->click_config_provider)
+            window->click_config_provider((ClickConfig *[]){ (window->overrides_back_button ? &backConfig : (ClickConfig *)NULL), &upConfig, &selectConfig, &downConfig }, window);
+    }
 }
 
 void window_set_click_config_provider(Window *window, ClickConfigProvider click_config_provider)
 {
     // TODO: verify.
     window->click_config_provider = click_config_provider;
-    click_config_provider((ClickConfig**)window->click_config_context, window);
+    
+    if (click_config_provider)
+        click_config_provider((ClickConfig *[]){ (window->overrides_back_button ? &backConfig : (ClickConfig *)NULL), &upConfig, &selectConfig, &downConfig }, window);
 }
 
 void window_set_background_color(Window *window, GColor background_color)
@@ -818,12 +802,22 @@ void window_set_background_color(Window *window, GColor background_color)
 void window_render(Window *window, GContext *ctx)
 {
     // TODO: figure it out.
+    if (window)
+    {
+        if (window->is_loaded && window->on_screen);
+        {
+            window->is_render_scheduled = true;
+            layer_mark_dirty(&window->layer);
+            window->is_render_scheduled = false;
+        }
+    }
 }
 
 void window_set_fullscreen(Window *window, bool enabled)
 {
     // TODO: verify.
-    window->is_fullscreen = enabled;
+    if (window)
+        window->is_fullscreen = enabled;
 }
 
 int32_t sin_lookup(int32_t angle)
@@ -1165,7 +1159,8 @@ void menu_layer_set_callbacks(MenuLayer *menu_layer, void *callback_context, Men
 
 void menu_layer_set_click_config_onto_window(MenuLayer *menu_layer, struct Window *window)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    window_set_click_config_provider(window, menu_layer->scroll_layer.callbacks.click_config_provider);
 }
 
 void menu_layer_set_selected_next(MenuLayer *menu_layer, bool up, MenuRowAlign scroll_align, bool animated)
@@ -1201,6 +1196,7 @@ void scroll_layer_add_child(ScrollLayer *scroll_layer, Layer *child)
 void scroll_layer_set_click_config_onto_window(ScrollLayer *scroll_layer, struct Window *window)
 {
     // TODO: figure it out.
+    window_set_click_config_provider(window, scroll_layer->callbacks.click_config_provider);
 }
 
 void scroll_layer_set_callbacks(ScrollLayer *scroll_layer, ScrollLayerCallbacks callbacks)
@@ -1276,18 +1272,16 @@ void simple_menu_layer_set_selected_index(SimpleMenuLayer *simple_menu, int inde
 void window_deinit(Window *window)
 {
     // TODO: verify.
-    free(((ClickConfig**)window->click_config_context)[BUTTON_ID_UP]);
-    free(((ClickConfig**)window->click_config_context)[BUTTON_ID_SELECT]);
-    free(((ClickConfig**)window->click_config_context)[BUTTON_ID_DOWN]);
-    free(window->click_config_context);
-    window->click_config_context = NULL;
 }
 
 void window_set_click_config_provider_with_context(Window *window, ClickConfigProvider click_config_provider, void *context)
 {
     // TODO: verify.
     window->click_config_context = context;
-    window_set_click_config_provider(window, click_config_provider);
+    window->click_config_provider = click_config_provider;
+    
+    if (click_config_provider)
+        click_config_provider((ClickConfig *[]){ (ClickConfig *)NULL, &upConfig, &selectConfig, &downConfig }, context);
 }
 
 ClickConfigProvider window_get_click_config_provider(Window *window)
@@ -1783,6 +1777,54 @@ uint32_t dict_calc_buffer_size_from_tuplets(const uint8_t tuplets_count, const T
 DictionaryResult dict_merge(DictionaryIterator *dest, uint32_t *dest_max_size_in_out, DictionaryIterator *source, const bool update_existing_keys_only, const DictionaryKeyUpdatedCallback key_callback, void *context)
 {
     // TODO: figure it out.
+    if (!dest || !dest_max_size_in_out || !source)
+        return DICT_INVALID_ARGS;
+    
+    Tuple* existingKeys[513];
+    Tuple* missingKeys[257];
+    
+    memset(existingKeys, 0, 513 * sizeof(Tuple*));
+    memset(missingKeys, 0, 257 * sizeof(Tuple*));
+    
+    Tuple* src_t = dict_read_first(source);
+    Tuple** existing_iter = existingKeys;
+    Tuple** missing_iter = missingKeys;
+    
+    do {
+        Tuple* dst_t;
+        if ((dst_t = dict_find(dest, src_t->key)) && dst_t->type == src_t->type && dst_t->length == src_t->length)
+        {
+            *existing_iter = dst_t;
+            ++existing_iter;
+            *existing_iter = src_t;
+            ++existing_iter;
+        }
+        else
+        {
+            *missing_iter = src_t;
+            missing_iter++;
+        }
+    } while ((src_t = dict_read_next(source)));
+        
+    if (!update_existing_keys_only)
+    {
+        dest->cursor = (Tuple*)dest->end;
+        
+    }
+    
+    existing_iter = existingKeys;
+    missing_iter = missingKeys;
+    
+    while (*existing_iter)
+    {
+        Tuple cpy_dst_t = **existing_iter;
+        Tuple * dst = *(existing_iter++);
+        Tuple * src = *(existing_iter++);
+        *dst = *src;
+        
+        if (key_callback)
+            key_callback(cpy_dst_t.key, dst, &cpy_dst_t, context);
+    }
 }
 
 Tuple *dict_find(const DictionaryIterator *iter, const uint32_t key)
@@ -1824,12 +1866,35 @@ void action_bar_layer_set_click_config_provider(ActionBarLayer *action_bar, Clic
 void action_bar_layer_set_icon(ActionBarLayer *action_bar, ButtonId button_id, const GBitmap *icon)
 {
     // TODO: verify.
-    action_bar->icons[button_id] = icon;
+    if (action_bar)
+    {
+        int idx;
+        
+        switch (button_id)
+        {
+            case BUTTON_ID_UP:
+                idx = 0;
+                break;
+            case BUTTON_ID_SELECT:
+                idx = 1;
+                break;
+            case BUTTON_ID_BACK:
+                idx = 2;
+                break;
+            default:
+                idx = -1;
+                break;
+        }
+        
+        action_bar->icons[idx] = icon;
+        action_bar->click_config_provider((ClickConfig *[]){ (ClickConfig *)NULL, &upConfig, &selectConfig, &downConfig }, action_bar->context);
+    }
 }
 
 void action_bar_layer_clear_icon(ActionBarLayer *action_bar, ButtonId button_id)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    action_bar_layer_set_icon(action_bar, button_id, NULL);
 }
 
 void action_bar_layer_add_to_window(ActionBarLayer *action_bar, struct Window *window)
@@ -1926,6 +1991,39 @@ void app_comm_set_sniff_interval(const SniffInterval interval)
 void app_log(uint8_t log_level, const char *src_filename, int src_line_number, const char *fmt, ...)
 {
     // TODO: figure it out.
+    va_list va;
+    char * level;
+    switch (log_level)
+    {
+        case APP_LOG_LEVEL_ERROR:
+            level = "error";
+            break;
+        case APP_LOG_LEVEL_WARNING:
+            level = "warning";
+            break;
+        case APP_LOG_LEVEL_INFO:
+            level = "info";
+            break;
+        case APP_LOG_LEVEL_DEBUG:
+            level = "debug";
+            break;
+        case APP_LOG_LEVEL_DEBUG_VERBOSE:
+            level = "verbose";
+            break;
+        default:
+            level = "undefined";
+    }
+    char fname[strlen(src_filename) + strlen(level) + 5];
+    sprintf(fname, "%s_%s.log", src_filename, level);
+    FILE * src_file = fopen(fname, "a");
+    if (src_file)
+    {
+        fprintf(src_file, "[\"%s\" logged at line %i]: ", level, src_line_number);
+        va_start(va, fmt);
+        vfprintf(src_file, fmt, va);
+        va_end(va);
+        fclose(src_file);
+    }
 }
 
 void graphics_draw_rect(GContext *ctx, GRect rect)

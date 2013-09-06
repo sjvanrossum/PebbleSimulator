@@ -7,9 +7,13 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "SRSimulatorWindowController.h"
 
 @interface SRAppDelegate : NSObject <NSApplicationDelegate>
+{
+    SRSimulatorWindowController * windowController;
+}
 
-@property (assign) IBOutlet NSWindow *window;
+-(IBAction)openPebbleApplication:(id)sender;
 
 @end
