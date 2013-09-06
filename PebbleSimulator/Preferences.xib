@@ -66,7 +66,7 @@
 							<nil key="NSToolbarItemView"/>
 							<object class="NSCustomResource" key="NSToolbarItemImage">
 								<string key="NSClassName">NSImage</string>
-								<string key="NSResourceName">SETTINGS_ICON_ABOUT</string>
+								<string key="NSResourceName">Settings-About</string>
 							</object>
 							<nil key="NSToolbarItemTarget"/>
 							<nil key="NSToolbarItemAction"/>
@@ -88,7 +88,7 @@
 							<nil key="NSToolbarItemView"/>
 							<object class="NSCustomResource" key="NSToolbarItemImage">
 								<string key="NSClassName">NSImage</string>
-								<string key="NSResourceName">SETTINGS_ICON_BLUETOOTH</string>
+								<string key="NSResourceName">Settings-Bluetooth</string>
 							</object>
 							<nil key="NSToolbarItemTarget"/>
 							<nil key="NSToolbarItemAction"/>
@@ -110,7 +110,7 @@
 							<nil key="NSToolbarItemView"/>
 							<object class="NSCustomResource" key="NSToolbarItemImage">
 								<string key="NSClassName">NSImage</string>
-								<string key="NSResourceName">LAUNCHER_ICON_CLOCK</string>
+								<string key="NSResourceName">Settings-DateTime</string>
 							</object>
 							<nil key="NSToolbarItemTarget"/>
 							<nil key="NSToolbarItemAction"/>
@@ -132,7 +132,7 @@
 							<nil key="NSToolbarItemView"/>
 							<object class="NSCustomResource" key="NSToolbarItemImage">
 								<string key="NSClassName">NSImage</string>
-								<string key="NSResourceName">MENU_ICON_EYE</string>
+								<string key="NSResourceName">Settings-Display</string>
 							</object>
 							<nil key="NSToolbarItemTarget"/>
 							<nil key="NSToolbarItemAction"/>
@@ -178,7 +178,7 @@
 							</object>
 						</object>
 					</dictionary>
-					<array class="NSMutableArray" key="NSToolbarIBAllowedItems">
+					<array key="NSToolbarIBAllowedItems">
 						<reference ref="431376005"/>
 						<reference ref="178569351"/>
 						<reference ref="517980974"/>
@@ -205,7 +205,7 @@
 							<int key="NSvFlags">18</int>
 							<string key="NSFrame">{{-8, -8}, {496, 286}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSNextKeyView" ref="816738243"/>
+							<reference key="NSWindow"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="417028892">
@@ -216,6 +216,7 @@
 										<array class="NSMutableArray" key="NSSubviews"/>
 										<string key="NSFrameSize">{496, 286}</string>
 										<reference key="NSSuperview" ref="432769836"/>
+										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="432769836"/>
 										<string key="NSReuseIdentifierKey">_NS:11</string>
 									</object>
@@ -280,6 +281,7 @@
 					</array>
 					<string key="NSFrameSize">{480, 270}</string>
 					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="432769836"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
@@ -475,12 +477,12 @@
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="LAUNCHER_ICON_CLOCK">{128, 128}</string>
-			<string key="MENU_ICON_EYE">{128, 128}</string>
 			<string key="NSMenuCheckmark">{11, 11}</string>
 			<string key="NSMenuMixedState">{10, 3}</string>
-			<string key="SETTINGS_ICON_ABOUT">{128, 128}</string>
-			<string key="SETTINGS_ICON_BLUETOOTH">{128, 128}</string>
+			<string key="Settings-About">{32, 32}</string>
+			<string key="Settings-Bluetooth">{32, 32}</string>
+			<string key="Settings-DateTime">{32, 32}</string>
+			<string key="Settings-Display">{32, 32}</string>
 		</dictionary>
 	</data>
 </archive>

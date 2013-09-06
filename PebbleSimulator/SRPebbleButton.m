@@ -16,7 +16,7 @@
     
     if (clickConfig)
     {
-        ClickRecognizer_s recognizer;
+        ClickRecognizer recognizer;
         recognizer.buttonID = (ButtonId)[self tag];
         
         [theEvent retain];
@@ -38,7 +38,7 @@
 {    
     if (clickConfig  && [[self cell] isHighlighted])
     {
-        ClickRecognizer_s recognizer;
+        ClickRecognizer recognizer;
         recognizer.buttonID = (ButtonId)[self tag];
         recognizer.clickCount = 1;
         
@@ -55,7 +55,7 @@
     
     if (clickConfig)
     {
-        ClickRecognizer_s recognizer;
+        ClickRecognizer recognizer;
         recognizer.buttonID = (ButtonId)[self tag];
         
         [theEvent retain];
