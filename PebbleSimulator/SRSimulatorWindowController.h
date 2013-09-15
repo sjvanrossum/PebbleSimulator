@@ -11,7 +11,7 @@
 #import "SRPebbleSimView.h"
 #import "SRPebbleButton.h"
 
-@interface SRSimulatorWindowController : NSWindowController
+@interface SRSimulatorWindowController : NSWindowController <NSWindowDelegate>
 {
     // Variables
     @private SRPebbleApplication * application;
@@ -28,6 +28,6 @@
 + (SRSimulatorWindowController *)sharedController;
 
 // Instance methods
-- (BOOL)runPebbleApplicationAtURL:(NSURL *)url;
+- (void)runPebbleApplicationAtURL:(NSURL *)url;
 
 @end

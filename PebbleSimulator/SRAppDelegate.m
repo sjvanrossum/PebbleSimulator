@@ -19,7 +19,6 @@
 {
     // Insert code here to initialize your application
     windowController = [SRSimulatorWindowController sharedController];
-    [windowController showWindow:self];
 }
 
 - (void)openPebbleApplication:(id)sender
@@ -31,7 +30,6 @@
     [openPanel setCanCreateDirectories:NO];
     if ([openPanel runModal] == NSFileHandlingPanelOKButton)
     {
-        [windowController showWindow:self];
         [windowController runPebbleApplicationAtURL:[openPanel URL]];
     }
 }

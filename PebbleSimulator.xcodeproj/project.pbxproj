@@ -501,16 +501,20 @@
 		EA3F7C3F171C1C30001BD65B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = i386;
 			};
 			name = Debug;
 		};
 		EA3F7C40171C1C30001BD65B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = i386;
 			};
 			name = Release;
 		};

@@ -40,7 +40,7 @@
 				<int key="NSWindowStyleMask">7</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{335, 390}, {216, 168}}</string>
-				<int key="NSWTFlags">1148716032</int>
+				<int key="NSWTFlags">1685586944</int>
 				<string key="NSWindowTitle">PebbleSimulator</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<nil key="NSViewClass"/>
@@ -113,6 +113,7 @@
 							<string key="NSFrame">{{180, 6}, {24, 48}}</string>
 							<reference key="NSSuperview" ref="617776823"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:22</string>
 							<int key="NSTag">3</int>
 							<bool key="NSEnabled">YES</bool>
@@ -177,7 +178,7 @@
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMinSize">{216, 190}</string>
 				<string key="NSMaxSize">{216, 190}</string>
-				<bool key="NSWindowIsRestorable">YES</bool>
+				<bool key="NSWindowIsRestorable">NO</bool>
 			</object>
 		</array>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -228,7 +229,15 @@
 						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="371842136"/>
 					</object>
-					<int key="connectionID">44</int>
+					<int key="connectionID">45</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="371842136"/>
+						<reference key="destination" ref="1001"/>
+					</object>
+					<int key="connectionID">46</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -841,7 +850,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">44</int>
+			<int key="maxID">46</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">

@@ -50,17 +50,22 @@
 {
     if (pbl_main)
     {
-        SimulatorParams params;
-        
-        // TODO: setup params.
-        
-        pbl_main(0);
+        applicationContext.runLoop = CFRunLoopGetCurrent();
+        pbl_main(&applicationContext);
     }
 }
 
-- (void)runPebbleApplicationInBackground
+- (void)runPebbleApplicationInBackgroundWithParameters:(SimulatorParams)parameters
 {
+    applicationContext = parameters;
     [self performSelectorInBackground:@selector(runPebbleApplication) withObject:nil];
+    [self performSelectorInBackground:@selector(runPebbleApplication) withObject:nil];
+
+}
+
+- (void)stopPebbleApplication
+{
+    CFRunLoopStop(applicationContext.runLoop);
 }
 
 - (void)dealloc

@@ -14,10 +14,12 @@
 {
     void * dlhandle;
     void (*pbl_main)(void * params);
+    SimulatorParams applicationContext;
 }
 
 - (id)initWithPebbleApplicationAtPath:(NSString *)path;
 - (bool)loadPebbleApplicationAtPath:(NSString *)path;
-- (void)runPebbleApplicationInBackground;
+- (void)runPebbleApplicationInBackgroundWithParameters:(SimulatorParams)parameters;
+- (void)stopPebbleApplication;
 
 @end

@@ -12,6 +12,9 @@
 #include <CoreGraphics/CoreGraphics.h>
 #include "pebble_os.h"
 
+const CFStringRef kSRPebbleButtonDown;
+const CFStringRef kSRPebbleButtonUp;
+
 typedef struct _SimulatorGContext {
     CGContextRef coreGraphicsContext;
     GCompOp compositingMode;
@@ -19,13 +22,26 @@ typedef struct _SimulatorGContext {
 
 typedef struct _SimulatorParams
 {
-    void (*setGraphicsContext)(SimulatorGContext * context);
-    void (*setAppHandlers)(PebbleAppHandlers * handlers);
-    void (*setWindowStack)(CFMutableArrayRef windowStack);
-    CFMutableDictionaryRef (*requestResourceManifest)(void);
-    void (*setclickConfigs)(ClickConfig** clickConfigs);
     PebbleAppHandlers * handlers;
+    CFMutableArrayRef windowStack;
+    CFDictionaryRef resourceManifest;
+    CFMutableDictionaryRef animationCollection;
+    CFMutableDictionaryRef appTimers;
+    
+    SimulatorGContext graphicsContext;
     CFRunLoopRef runLoop;
+    void * backButton;
+    void * upButton;
+    void * selectButton;
+    void * downButton;
+    
+    ClickConfig backConfig;
+    ClickConfig upConfig;
+    ClickConfig selectConfig;
+    ClickConfig downConfig;
+    
+    uint32_t uptime_ms;
+    PblTm pblNow;
 } SimulatorParams;
 
 typedef struct _ClickRecognizer

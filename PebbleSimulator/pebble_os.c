@@ -18,21 +18,10 @@
 #include <time.h>
 #include <sys/time.h>
 
-PblTm pblNow;
+const CFStringRef kSRPebbleButtonDown = CFSTR("kSRPebbleButtonDown");
+const CFStringRef kSRPebbleButtonUp = CFSTR("kSRPebbleButtonDown");
 
-FILE * resourcepack = NULL;
-SimulatorGContext gCtx = (SimulatorGContext) { NULL, NULL };
-
-ClickConfig backConfig;
-ClickConfig upConfig;
-ClickConfig selectConfig;
-ClickConfig downConfig;
-
-uint32_t uptime_ms = 0;
-
-CFMutableArrayRef windowStack;
-CFMutableDictionaryRef animationCollection;
-CFMutableDictionaryRef appTimers;
+__thread SimulatorParams * appParameters;
 
 void animation_update_applier(const void* key, const void *value, void *context);
 void animation_unschedule_applier(const void *key, const void *value, void *context);
@@ -132,25 +121,25 @@ void animation_schedule(struct Animation *animation)
     // TODO: verify.
     if (animation)
     {
-        if (CFDictionaryContainsKey(animationCollection, animation))
+        if (CFDictionaryContainsKey(appParameters->animationCollection, animation))
         {
             animation_unschedule(animation);
         }
         
-        animation->abs_start_time_ms = uptime_ms;
+        animation->abs_start_time_ms = appParameters->uptime_ms;
         animation->implementation->setup(animation);
         animation->handlers.started(animation, animation->context);
         uint32_t total_duration = animation->duration_ms + animation->delay_ms;
-        CFDictionaryAddValue(animationCollection, animation, CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &total_duration));
+        CFDictionaryAddValue(appParameters->animationCollection, animation, CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &total_duration));
     }
 }
 
 void animation_unschedule(struct Animation *animation)
 {
     // TODO: verify.
-    if (CFDictionaryContainsKey(animationCollection, animation))
+    if (CFDictionaryContainsKey(appParameters->animationCollection, animation))
     {
-        CFDictionaryRemoveValue(animationCollection, animation);
+        CFDictionaryRemoveValue(appParameters->animationCollection, animation);
         animation->handlers.stopped(animation, animation->is_completed, animation->context);
         animation->implementation->teardown(animation);
         animation->abs_start_time_ms = 0;
@@ -160,7 +149,7 @@ void animation_unschedule(struct Animation *animation)
 void animation_unschedule_all(void)
 {
     // TODO: verify.
-    CFDictionaryApplyFunction(animationCollection, animation_unschedule_applier, NULL);
+    CFDictionaryApplyFunction(appParameters->animationCollection, animation_unschedule_applier, NULL);
 }
 
 bool animation_is_scheduled(struct Animation *animation)
@@ -168,7 +157,7 @@ bool animation_is_scheduled(struct Animation *animation)
     // TODO: verify.
     if (animation)
     {
-        return (bool)CFDictionaryContainsKey(animationCollection, animation);
+        return (bool)CFDictionaryContainsKey(appParameters->animationCollection, animation);
     }
     else
     {
@@ -181,7 +170,7 @@ AppTimerHandle app_timer_send_event(AppContextRef app_ctx, uint32_t timeout_ms, 
     // TODO: verify.
     CFNumberRef key = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &cookie);
     CFNumberRef value = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &timeout_ms);
-    CFDictionaryAddValue(appTimers, key, value);
+    CFDictionaryAddValue(appParameters->appTimers, key, value);
     CFRelease(key);
     CFRelease(value);
     return cookie;
@@ -191,10 +180,10 @@ bool app_timer_cancel_event(AppContextRef app_ctx_ref, AppTimerHandle handle)
 {
     // TODO: verify.
     CFNumberRef key = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &handle);
-    bool exists = CFDictionaryContainsValue(appTimers, key);
+    bool exists = CFDictionaryContainsValue(appParameters->appTimers, key);
     
     if (exists)
-        CFDictionaryRemoveValue(appTimers, key);
+        CFDictionaryRemoveValue(appParameters->appTimers, key);
     
     CFRelease(key);
     return exists;
@@ -216,7 +205,7 @@ void animation_update_applier(const void *key, const void *value, void *context)
     uint32_t total_duration_ms_val;
     CFNumberGetValue(total_duration_ms, kCFNumberIntType, &total_duration_ms_val);
     ++total_duration_ms_val;
-    CFDictionaryReplaceValue(animationCollection, key, CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &total_duration_ms_val));
+    CFDictionaryReplaceValue(appParameters->animationCollection, key, CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &total_duration_ms_val));
     
     if (total_duration_ms_val >= animation->delay_ms)
     {
@@ -239,13 +228,13 @@ void app_timer_applier(const void *key, const void *value, void *context)
     uint32_t baseVal;
     CFNumberGetValue(val, kCFNumberIntType, &baseVal);
     --baseVal;
-    CFDictionaryReplaceValue(appTimers, key, CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &baseVal));
+    CFDictionaryReplaceValue(appParameters->appTimers, key, CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &baseVal));
     if (baseVal == 0)
     {
         uint32_t cookie;
         CFNumberGetValue(key, kCFNumberIntType, &cookie);
         (((SimulatorParams *)context)->handlers->timer_handler)(context, cookie, cookie);
-        CFDictionaryRemoveValue(appTimers, key);
+        CFDictionaryRemoveValue(appParameters->appTimers, key);
     }
 }
 
@@ -253,16 +242,15 @@ void app_callback_loop(CFRunLoopTimerRef timer, void * info)
 {
     // TODO: verify.
     SimulatorParams * app_task_ctx = (SimulatorParams *)info;
-    
     if (app_task_ctx)
     {
         PebbleAppHandlers * handlers = app_task_ctx->handlers;
         
-        CFDictionaryApplyFunction(animationCollection, &animation_update_applier, app_task_ctx);
+        CFDictionaryApplyFunction(appParameters->animationCollection, &animation_update_applier, app_task_ctx);
         
         if (handlers->timer_handler)
         {
-            CFDictionaryApplyFunction(appTimers, &app_timer_applier, app_task_ctx);
+            CFDictionaryApplyFunction(appParameters->appTimers, &app_timer_applier, app_task_ctx);
         }
         
         PblTm itmPblNow;
@@ -271,51 +259,48 @@ void app_callback_loop(CFRunLoopTimerRef timer, void * info)
         {
             TimeUnits flags = handlers->tick_info.tick_units;
             TimeUnits units_changed = 0;
-            if (flags & YEAR_UNIT && itmPblNow.tm_year != pblNow.tm_year)
+            if (flags & YEAR_UNIT && itmPblNow.tm_year != appParameters->pblNow.tm_year)
                 units_changed |= YEAR_UNIT;
-            if (flags & MONTH_UNIT && itmPblNow.tm_mon != pblNow.tm_mon)
+            if (flags & MONTH_UNIT && itmPblNow.tm_mon != appParameters->pblNow.tm_mon)
                 units_changed |= MONTH_UNIT;
-            if (flags & DAY_UNIT && itmPblNow.tm_mday != pblNow.tm_mday)
+            if (flags & DAY_UNIT && itmPblNow.tm_mday != appParameters->pblNow.tm_mday)
                 units_changed |= DAY_UNIT;
-            if (flags & HOUR_UNIT && itmPblNow.tm_hour != pblNow.tm_hour)
+            if (flags & HOUR_UNIT && itmPblNow.tm_hour != appParameters->pblNow.tm_hour)
                 units_changed |= HOUR_UNIT;
-            if (flags & MINUTE_UNIT && itmPblNow.tm_min != pblNow.tm_min)
+            if (flags & MINUTE_UNIT && itmPblNow.tm_min != appParameters->pblNow.tm_min)
                 units_changed |= MINUTE_UNIT;
-            if (flags & SECOND_UNIT && itmPblNow.tm_sec != pblNow.tm_sec)
+            if (flags & SECOND_UNIT && itmPblNow.tm_sec != appParameters->pblNow.tm_sec)
                 units_changed |= SECOND_UNIT;
             
             if (units_changed != 0)
                 handlers->tick_info.tick_handler(app_task_ctx, &((PebbleTickEvent) { .tick_time = &itmPblNow, .units_changed = units_changed }));
         }
-        pblNow = itmPblNow;
+        appParameters->pblNow = itmPblNow;
     }
-    ++uptime_ms;
+    ++(appParameters->uptime_ms);
 }
 
 void app_event_loop(AppTaskContextRef app_task_ctx, PebbleAppHandlers *handlers)
 {
     // TODO: verify.
     // VERY IMPORTANT.
+    printf("%p\n", &appParameters->graphicsContext);
     SimulatorParams * app_params = (SimulatorParams *)app_task_ctx;
-    if (app_params)
-    {
-        app_params->setGraphicsContext(&gCtx);
-        app_params->handlers = handlers;
-    }
-    
-    animationCollection = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
-    appTimers = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
+    appParameters->animationCollection = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
+    appParameters->appTimers = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
     
     //CFRunLoopSourceRef graphicsSource = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, 0);
     
-    get_time(&pblNow);
+    get_time(&appParameters->pblNow);
     CFRunLoopTimerRef timer = CFRunLoopTimerCreate(kCFAllocatorDefault, CFAbsoluteTimeGetCurrent(), 1.0/1000.0, 0, 0, &app_callback_loop, &((CFRunLoopTimerContext){ .info = app_params }));
     CFRunLoopAddTimer(CFRunLoopGetCurrent(), timer, kCFRunLoopDefaultMode);
     
     if (handlers->init_handler)
-        handlers->init_handler(app_task_ctx);
-    if (handlers->tick_info.tick_handler)
-        handlers->tick_info.tick_handler(app_task_ctx, &((PebbleTickEvent) { .tick_time = &pblNow, .units_changed = 0 }));
+        handlers->init_handler((AppContextRef)app_task_ctx);
+    
+    // PebbleKit doesn't do this itself and the watchapp is expected to call this in init.
+    //if (handlers->tick_info.tick_handler)
+    //    handlers->tick_info.tick_handler((AppContextRef)app_task_ctx, &((PebbleTickEvent) { .tick_time = &pblNow, .units_changed = 0 }));
     
     CFRunLoopRun();
     
@@ -567,7 +552,7 @@ void layer_mark_dirty(Layer *layer)
     // TODO: verify.
     if (layer)
     {
-        layer->update_proc(layer, &gCtx);
+        layer->update_proc(layer, &appParameters->graphicsContext);
         Layer * childLayer = layer->first_child;
         while (childLayer)
         {
@@ -776,11 +761,11 @@ void window_stack_push(Window *window, bool animated)
         if (top)
             top->on_screen = false;
         
-        CFArrayAppendValue(windowStack, window);
+        CFArrayAppendValue(appParameters->windowStack, window);
         window->on_screen = true;
         
         if (window->click_config_provider)
-            window->click_config_provider((ClickConfig *[]){ (window->overrides_back_button ? &backConfig : (ClickConfig *)NULL), &upConfig, &selectConfig, &downConfig }, window);
+            window->click_config_provider((ClickConfig *[]){ (window->overrides_back_button ? &appParameters->backConfig : (ClickConfig *)NULL), &appParameters->upConfig, &appParameters->selectConfig, &appParameters->downConfig }, window);
     }
 }
 
@@ -790,25 +775,26 @@ void window_set_click_config_provider(Window *window, ClickConfigProvider click_
     window->click_config_provider = click_config_provider;
     
     if (click_config_provider)
-        click_config_provider((ClickConfig *[]){ (window->overrides_back_button ? &backConfig : (ClickConfig *)NULL), &upConfig, &selectConfig, &downConfig }, window);
+        click_config_provider((ClickConfig *[]){ (window->overrides_back_button ? &appParameters->backConfig : (ClickConfig *)NULL), &appParameters->upConfig, &appParameters->selectConfig, &appParameters->downConfig }, window);
 }
 
 void window_set_background_color(Window *window, GColor background_color)
 {
     // TODO: verify.
     window->background_color = background_color;
+    layer_mark_dirty(&window->layer);
+    window->is_render_scheduled = true;
 }
 
 void window_render(Window *window, GContext *ctx)
 {
-    // TODO: figure it out.
+    // TODO: verify.
     if (window)
     {
         if (window->is_loaded && window->on_screen);
         {
-            window->is_render_scheduled = true;
             layer_mark_dirty(&window->layer);
-            window->is_render_scheduled = false;
+            window->is_render_scheduled = true;
         }
     }
 }
@@ -818,6 +804,8 @@ void window_set_fullscreen(Window *window, bool enabled)
     // TODO: verify.
     if (window)
         window->is_fullscreen = enabled;
+    
+    layer_mark_dirty(&window->layer);
 }
 
 int32_t sin_lookup(int32_t angle)
@@ -910,7 +898,7 @@ void vibes_short_pulse(void)
 GContext *app_get_current_graphics_context(void)
 {
     // TODO: verify.
-    return &gCtx;
+    return (GContext *)&appParameters->graphicsContext;
 }
 
 bool clock_is_24h_style(void)
@@ -933,6 +921,8 @@ void text_layer_set_text_alignment(TextLayer *text_layer, GTextAlignment text_al
 void graphics_draw_bitmap_in_rect(GContext *ctx, const GBitmap *bitmap, GRect rect)
 {
     // TODO: figure it out.
+    SimulatorGContext * context = (SimulatorGContext *)ctx;
+    CGRect destRect = CGRectMake(rect.origin.x, rect.origin.y, rect.size.w, rect.size.h);
 }
 
 void graphics_text_draw(GContext *ctx, const char *text, const GFont font, const GRect box, const GTextOverflowMode overflow_mode, const GTextAlignment alignment, const GTextLayoutCacheRef layout)
@@ -1281,7 +1271,7 @@ void window_set_click_config_provider_with_context(Window *window, ClickConfigPr
     window->click_config_provider = click_config_provider;
     
     if (click_config_provider)
-        click_config_provider((ClickConfig *[]){ (ClickConfig *)NULL, &upConfig, &selectConfig, &downConfig }, context);
+        click_config_provider((ClickConfig *[]){ (window->overrides_back_button ? &appParameters->backConfig : (ClickConfig *)NULL), &appParameters->upConfig, &appParameters->selectConfig, &appParameters->downConfig }, context);
 }
 
 ClickConfigProvider window_get_click_config_provider(Window *window)
@@ -1325,10 +1315,10 @@ bool window_is_loaded(Window *window)
 Window *window_stack_pop(bool animated)
 {
     // TODO: verify.
-    CFIndex idx = CFArrayGetCount(windowStack) - 1;
-    Window* window = (Window *)CFArrayGetValueAtIndex(windowStack, idx);
+    CFIndex idx = CFArrayGetCount(appParameters->windowStack) - 1;
+    Window* window = (Window *)CFArrayGetValueAtIndex(appParameters->windowStack, idx);
     
-    CFArrayRemoveValueAtIndex(windowStack, idx);
+    CFArrayRemoveValueAtIndex(appParameters->windowStack, idx);
     
     return window;
 }
@@ -1336,20 +1326,20 @@ Window *window_stack_pop(bool animated)
 void window_stack_pop_all(const bool animated)
 {
     // TODO: verify.
-    CFArrayRemoveAllValues(windowStack);
+    CFArrayRemoveAllValues(appParameters->windowStack);
 }
 
 bool window_stack_contains_window(Window *window)
 {
     // TODO: verify.
-    return CFArrayContainsValue(windowStack, CFRangeMake(0, CFArrayGetCount(windowStack)), window);
+    return CFArrayContainsValue(appParameters->windowStack, CFRangeMake(0, CFArrayGetCount(appParameters->windowStack)), window);
 }
 
 Window *window_stack_get_top_window(void)
 {
     // TODO: verify.
-    CFIndex idx = CFArrayGetCount(windowStack) - 1;
-    Window* window = (Window *)CFArrayGetValueAtIndex(windowStack, idx);
+    CFIndex idx = CFArrayGetCount(appParameters->windowStack) - 1;
+    Window* window = (Window *)CFArrayGetValueAtIndex(appParameters->windowStack, idx);
     
     return window;
 }
@@ -1362,21 +1352,54 @@ Window *window_stack_remove(Window *window, bool animated)
 void property_animation_init(struct PropertyAnimation *property_animation, const struct PropertyAnimationImplementation *implementation, void *subject, void *from_value, void *to_value)
 {
     // TODO: malloc/init.
+    property_animation->animation.implementation = (AnimationImplementation *)&implementation;
+    property_animation->subject = subject;
 }
 
 void property_animation_update_int16(struct PropertyAnimation *property_animation, const uint32_t time_normalized)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    float lto = (float)time_normalized / (float)ANIMATION_NORMALIZED_MAX;
+    float lfrom = 1.0f - lto;
+    int16_t newVal = (int16_t)(lfrom * property_animation->values.from.int16 + lto * property_animation->values.to.int16);
+    ((PropertyAnimationImplementation *)property_animation->animation.implementation)->accessors.setter.int16(property_animation->subject, newVal);
 }
 
 void property_animation_update_gpoint(struct PropertyAnimation *property_animation, const uint32_t time_normalized)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    float lto = (float)time_normalized / (float)ANIMATION_NORMALIZED_MAX;
+    float lfrom = 1.0f - lto;
+    GPoint newVal = (GPoint)
+    {
+        (int16_t)(lfrom * property_animation->values.from.gpoint.x + lto * property_animation->values.to.gpoint.x),
+        (int16_t)(lfrom * property_animation->values.from.gpoint.y + lto * property_animation->values.to.gpoint.y)
+
+    };
+    
+    ((PropertyAnimationImplementation *)property_animation->animation.implementation)->accessors.setter.gpoint(property_animation->subject, newVal);
 }
 
 void property_animation_update_grect(struct PropertyAnimation *property_animation, const uint32_t time_normalized)
 {
-    // TODO: figure it out.
+    // TODO: verify.
+    float lto = (float)time_normalized / (float)ANIMATION_NORMALIZED_MAX;
+    float lfrom = 1.0f - lto;
+    
+    GRect newVal = (GRect)
+    {
+        (GPoint)
+        {
+            (int16_t)(lfrom * property_animation->values.from.grect.origin.x + lto * property_animation->values.to.grect.origin.x),
+            (int16_t)(lfrom * property_animation->values.from.grect.origin.y + lto * property_animation->values.to.grect.origin.y)
+        },
+        (GSize)
+        {
+            (int16_t)(lfrom * property_animation->values.from.grect.size.w + lto * property_animation->values.to.grect.size.w),
+            (int16_t)(lfrom * property_animation->values.from.grect.size.h + lto * property_animation->values.to.grect.size.h)
+        }
+    };
+    ((PropertyAnimationImplementation *)property_animation->animation.implementation)->accessors.setter.grect(property_animation->subject, newVal);
 }
 
 AppMessageResult app_message_register_callbacks(AppMessageCallbacksNode *callbacks_node)
@@ -1882,12 +1905,11 @@ void action_bar_layer_set_icon(ActionBarLayer *action_bar, ButtonId button_id, c
                 idx = 2;
                 break;
             default:
-                idx = -1;
-                break;
+                return;
         }
         
         action_bar->icons[idx] = icon;
-        action_bar->click_config_provider((ClickConfig *[]){ (ClickConfig *)NULL, &upConfig, &selectConfig, &downConfig }, action_bar->context);
+        action_bar->click_config_provider((ClickConfig *[]){ (ClickConfig *)NULL, &appParameters->upConfig, &appParameters->selectConfig, &appParameters->downConfig }, action_bar->context);
     }
 }
 
@@ -1900,7 +1922,7 @@ void action_bar_layer_clear_icon(ActionBarLayer *action_bar, ButtonId button_id)
 void action_bar_layer_add_to_window(ActionBarLayer *action_bar, struct Window *window)
 {
     // TODO: figure it out.
-    layer_add_child(window_get_root_layer(window), &action_bar->layer);
+    layer_add_child(&window->layer, &action_bar->layer);
 }
 
 void action_bar_layer_remove_from_window(ActionBarLayer *action_bar)
@@ -1935,13 +1957,19 @@ void number_window_init(NumberWindow *numberwindow, const char *label, NumberWin
 void number_window_set_label(NumberWindow *numberwindow, const char *label)
 {
     // TODO: verify.
-    numberwindow->value_label.text = label;
+    if (numberwindow)
+    {
+        numberwindow->value_label.text = label;
+    }
 }
 
 void number_window_set_max(NumberWindow *numberwindow, int max)
 {
     // TODO: verify.
-    numberwindow->max_val = max;
+    if (numberwindow)
+    {
+        numberwindow->max_val = max;
+    }
 }
 
 void number_window_set_min(NumberWindow *numberwindow, int min)
@@ -1953,19 +1981,32 @@ void number_window_set_min(NumberWindow *numberwindow, int min)
 void number_window_set_value(NumberWindow *numberwindow, int value)
 {
     // TODO: verify.
-    numberwindow->value = value;
+    if (numberwindow)
+    {
+        numberwindow->value = value;
+    }
 }
 
 void number_window_set_step_size(NumberWindow *numberwindow, int step)
 {
     // TODO: verify.
-    numberwindow->step_size = step;
+    if (numberwindow)
+    {
+        numberwindow->step_size = step;
+    }
 }
 
 int number_window_get_value(NumberWindow *numberwindow)
 {
     // TODO: verify.
-    return numberwindow->value;
+    if (numberwindow)
+    {
+        return numberwindow->value;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 void clock_copy_time_string(char *buffer, uint8_t size)

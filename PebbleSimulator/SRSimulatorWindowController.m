@@ -13,21 +13,36 @@
 
 static SRSimulatorWindowController * sharedInstance = nil;
 
-- (void)windowDidLoad
+- (void)windowWillClose:(NSNotification *)notification
 {
-    [super windowDidLoad];
+    NSLog(@"%s", __func__);
+    [application stopPebbleApplication];
+    [application release];
+    [[self displayView] releaseGState];
 }
 
-- (BOOL)runPebbleApplicationAtURL:(NSURL *)url
+- (void)runPebbleApplicationAtURL:(NSURL *)url
 {
-    if (application)
-        [application release];
+    if ([[self window] isVisible])
+        [[self window] close];
+    
+    [[self displayView] allocateGState];
     
     [url retain];
     application = [[SRPebbleApplication alloc] initWithPebbleApplicationAtPath:[url path]];
     [url release];
-    
-    [application runPebbleApplicationInBackground];
+    [self showWindow:self];
+    [application runPebbleApplicationInBackgroundWithParameters:(SimulatorParams){
+        .backButton = backButton,
+        .upButton = upButton,
+        .selectButton = selectButton,
+        .downButton = downButton,
+        .graphicsContext = (SimulatorGContext){
+            .coreGraphicsContext = 0,
+            .compositingMode = 0
+        },
+        
+    }];
 }
 
 + (SRSimulatorWindowController *)sharedController
