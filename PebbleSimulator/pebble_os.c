@@ -1425,7 +1425,7 @@ Window *window_stack_remove(Window *window, bool animated)
     // TODO: figure it out.
 }
 
-#pragma mark Property Animation
+#pragma mark - Property Animation
 
 void property_animation_init(struct PropertyAnimation *property_animation, const struct PropertyAnimationImplementation *implementation, void *subject, void *from_value, void *to_value)
 {
