@@ -29,6 +29,8 @@ void animation_unschedule_applier(const void *key, const void *value, void *cont
 void app_timer_applier(const void *key, const void *value, void *context);
 void app_callback_loop(CFRunLoopTimerRef timer, void * info);
 
+#pragma mark - Animation
+
 void animation_init(struct Animation *animation)
 {
     // TODO: verify.
@@ -165,6 +167,8 @@ bool animation_is_scheduled(struct Animation *animation)
     }
 }
 
+#pragma mark - Timer
+
 AppTimerHandle app_timer_send_event(AppContextRef app_ctx, uint32_t timeout_ms, uint32_t cookie)
 {
     // TODO: verify.
@@ -188,6 +192,8 @@ bool app_timer_cancel_event(AppContextRef app_ctx_ref, AppTimerHandle handle)
     CFRelease(key);
     return exists;
 }
+
+#pragma mark - Event Loop
 
 void animation_unschedule_applier(const void *key, const void *value, void *context)
 {
@@ -310,6 +316,8 @@ void app_event_loop(AppTaskContextRef app_task_ctx, PebbleAppHandlers *handlers)
     CFRelease(timer);
 }
 
+#pragma mark - Bitmap Container
+
 bool bmp_init_container(int resource_id, BmpContainer *c)
 {
     // TODO: malloc/init.
@@ -320,12 +328,16 @@ void bmp_deinit_container(BmpContainer *c)
     // TODO: free.
 }
 
+#pragma mark - Cosine
+
 int32_t cos_lookup(int32_t angle)
 {
     // TODO: verify.
     // incorrect.
     return (int32_t)cos((double)angle);
 }
+
+#pragma mark - Fonts
 
 GFont fonts_get_system_font(const char *font_key)
 {
@@ -341,6 +353,8 @@ void fonts_unload_custom_font(GFont font)
 {
     // TODO: free.
 }
+
+#pragma mark - Graphics Context
 
 void graphics_context_set_stroke_color(GContext *ctx, GColor color)
 {
@@ -462,6 +476,8 @@ void graphics_draw_round_rect(GContext *ctx, GRect rect, int radius)
     CGPathRelease(path);
 }
 
+#pragma mark - Time
+
 void get_time(PblTm *t)
 {
     // TODO: verify.
@@ -481,6 +497,8 @@ void get_time(PblTm *t)
         .tm_isdst = itm->tm_isdst
     };
 }
+
+#pragma mark - Path
 
 void gpath_init(GPath *path, const GPathInfo *init)
 {
@@ -541,11 +559,15 @@ void gpath_draw_filled(GContext *ctx, GPath *path)
     CGPathRelease(corePath);
 }
 
+#pragma mark - Rect
+
 GPoint grect_center_point(GRect *rect)
 {
     // TODO: verify.
     return GPoint(rect->origin.x + rect->size.w / 2, rect->origin.y + rect->size.h / 2);
 }
+
+#pragma mark - Layer
 
 void layer_mark_dirty(Layer *layer)
 {
@@ -653,6 +675,8 @@ void layer_init(Layer *layer, GRect frame)
     layer->update_proc = NULL;
 }
 
+#pragma mark - Light
+
 void light_enable(bool enable)
 {
     // TODO: verify.
@@ -665,11 +689,15 @@ void light_enable_interaction(void)
     // Do nothing?
 }
 
+#pragma mark - Sleep
+
 void psleep(int millis)
 {
     // TODO: verify.
     usleep((useconds_t)millis);
 }
+
+#pragma mark - Resources
 
 void resource_init_current_app(ResVersionHandle version)
 {
@@ -695,6 +723,8 @@ size_t resource_size(ResHandle h)
 {
     // TODO: figure it out.
 }
+
+#pragma mark - Rotated Bitmap Container DEPRECATED
 
 void rotbmp_deinit_container(RotBmpContainer *c)
 {
@@ -727,6 +757,8 @@ void rotbmp_pair_layer_set_angle(RotBmpPairLayer *pair, int32_t angle)
 {
     // TODO: no implementation, deprecated.
 }
+
+#pragma mark - Window
 
 void window_init(Window *window, const char *debug_name)
 {
@@ -808,12 +840,16 @@ void window_set_fullscreen(Window *window, bool enabled)
     layer_mark_dirty(&window->layer);
 }
 
+#pragma mark - Sine
+
 int32_t sin_lookup(int32_t angle)
 {
     // TODO: verify.
     // The force isn't with me.
     return (int32_t)sin((double)angle);
 }
+
+#pragma mark - Time
 
 void string_format_time(char *ptr, size_t maxsize, const char *format, const PblTm *timeptr)
 {
@@ -832,6 +868,8 @@ void string_format_time(char *ptr, size_t maxsize, const char *format, const Pbl
     };
     strftime(ptr, maxsize, format, &itm);
 }
+
+#pragma mark - Text Layer
 
 void text_layer_init(TextLayer *text_layer, GRect frame)
 {
@@ -868,6 +906,8 @@ void text_layer_set_background_color(TextLayer *text_layer, GColor color)
     text_layer->background_color = color;
 }
 
+#pragma mark - Vibes
+
 void vibes_double_pulse(void)
 {
     // TODO: verify.
@@ -895,11 +935,15 @@ void vibes_short_pulse(void)
     printf("Short vibe.\n");
 }
 
+#pragma mark - Graphics Context
+
 GContext *app_get_current_graphics_context(void)
 {
     // TODO: verify.
     return (GContext *)&appParameters->graphicsContext;
 }
+
+#pragma mark - Time
 
 bool clock_is_24h_style(void)
 {
@@ -907,16 +951,22 @@ bool clock_is_24h_style(void)
     return true;
 }
 
+#pragma mark - Property Animation
+
 void property_animation_init_layer_frame(struct PropertyAnimation *property_animation, struct Layer *layer, GRect *from_frame, GRect *to_frame)
 {
     // TODO: malloc/init.
 }
+
+#pragma mark - Text Layer
 
 void text_layer_set_text_alignment(TextLayer *text_layer, GTextAlignment text_alignment)
 {
     // TODO: verify.
     text_layer->text_alignment = text_alignment;
 }
+
+#pragma mark - Graphics Context
 
 void graphics_draw_bitmap_in_rect(GContext *ctx, const GBitmap *bitmap, GRect rect)
 {
@@ -929,6 +979,8 @@ void graphics_text_draw(GContext *ctx, const char *text, const GFont font, const
 {
     // TODO: figure it out.
 }
+
+#pragma mark - Layer
 
 void layer_set_bounds(Layer *layer, GRect bounds)
 {
@@ -1032,6 +1084,8 @@ bool layer_get_clips(Layer *layer)
     return layer->clips;
 }
 
+#pragma mark - Text Layer
+
 GSize text_layer_get_max_used_size(GContext *ctx, TextLayer *text_layer)
 {
     // TODO: figure it out.
@@ -1050,15 +1104,21 @@ void text_layer_set_overflow_mode(TextLayer *text_layer, GTextOverflowMode line_
     text_layer->overflow_mode = line_mode;
 }
 
+#pragma mark - Graphics Context
+
 GSize graphics_text_layout_get_max_used_size(GContext *ctx, const char *text, const GFont font, const GRect box, const GTextOverflowMode overflow_mode, const GTextAlignment alignment, GTextLayoutCacheRef layout)
 {
     // TODO: figure it out.
 }
 
+#pragma mark - Inverter Layer
+
 void inverter_layer_init(InverterLayer *inverter, GRect frame)
 {
     // TODO: malloc/init.
 }
+
+#pragma mark - Bitmap Layer
 
 void bitmap_layer_init(BitmapLayer *bitmap_layer, GRect frame)
 {
@@ -1089,6 +1149,8 @@ void bitmap_layer_set_compositing_mode(BitmapLayer *bitmap_layer, GCompOp mode)
     bitmap_layer->compositing_mode = mode;
 }
 
+#pragma mark - Heap Bitmap
+
 bool heap_bitmap_init(HeapBitmap *hb, int resource_id)
 {
     // TODO: malloc/init.
@@ -1099,6 +1161,8 @@ void heap_bitmap_deinit(HeapBitmap *hb)
     // TODO: figure it out.
 }
 
+#pragma mark - Click Recognizer
+
 ButtonId click_recognizer_get_button_id(ClickRecognizerRef recognizer)
 {
     // TODO: figure it out.
@@ -1108,6 +1172,8 @@ uint8_t click_number_of_clicks_counted(ClickRecognizerRef recognizer)
 {
     // TODO: figure it out.
 }
+
+#pragma mark - Menu Cell
 
 void menu_cell_basic_draw(GContext *ctx, const Layer *cell_layer, const char *title, const char *subtitle, GBitmap *icon)
 {
@@ -1123,6 +1189,8 @@ void menu_cell_basic_header_draw(GContext *ctx, const Layer *cell_layer, const c
 {
     // TODO: figure it out.
 }
+
+#pragma mark - Menu Layer
 
 void menu_layer_init(MenuLayer *menu_layer, GRect frame)
 {
@@ -1172,6 +1240,8 @@ int16_t menu_index_compare(MenuIndex *a, MenuIndex *b)
 {
     // TODO: figure it out.
 }
+
+#pragma mark - Scroll Layer
 
 void scroll_layer_init(ScrollLayer *scroll_layer, GRect frame)
 {
@@ -1239,6 +1309,8 @@ void scroll_layer_scroll_down_click_handler(ClickRecognizerRef recognizer, Scrol
     // TODO: figure it out.
 }
 
+#pragma mark - Simple Menu Layer
+
 void simple_menu_layer_init(SimpleMenuLayer *simple_menu, GRect frame, Window *window, const SimpleMenuSection *sections, int num_sections, void *callback_context)
 {
     // TODO: malloc/init.
@@ -1258,6 +1330,8 @@ void simple_menu_layer_set_selected_index(SimpleMenuLayer *simple_menu, int inde
 {
     // TODO: figure it out.
 }
+
+#pragma mark - Window
 
 void window_deinit(Window *window)
 {
@@ -1312,6 +1386,8 @@ bool window_is_loaded(Window *window)
     return window->is_loaded;
 }
 
+#pragma mark - Window Stack
+
 Window *window_stack_pop(bool animated)
 {
     // TODO: verify.
@@ -1348,6 +1424,8 @@ Window *window_stack_remove(Window *window, bool animated)
 {
     // TODO: figure it out.
 }
+
+#pragma mark Property Animation
 
 void property_animation_init(struct PropertyAnimation *property_animation, const struct PropertyAnimationImplementation *implementation, void *subject, void *from_value, void *to_value)
 {
@@ -1402,6 +1480,8 @@ void property_animation_update_grect(struct PropertyAnimation *property_animatio
     ((PropertyAnimationImplementation *)property_animation->animation.implementation)->accessors.setter.grect(property_animation->subject, newVal);
 }
 
+#pragma mark - App Sync
+
 AppMessageResult app_message_register_callbacks(AppMessageCallbacksNode *callbacks_node)
 {
     // TODO: figure it out.
@@ -1447,6 +1527,8 @@ const Tuple *app_sync_get(const struct AppSync *s, const uint32_t key)
     // TODO: verify.
     return dict_find(&s->current_iter, key);
 }
+
+#pragma mark - Dictionary
 
 uint32_t dict_calc_buffer_size(const uint8_t tuple_count, ...)
 {
@@ -1869,6 +1951,8 @@ Tuple *dict_find(const DictionaryIterator *iter, const uint32_t key)
     return res;
 }
 
+#pragma mark - Action Bar Layer
+
 void action_bar_layer_init(ActionBarLayer *action_bar)
 {
     // TODO: malloc/init.
@@ -1937,6 +2021,8 @@ void action_bar_layer_set_background_color(ActionBarLayer *action_bar, GColor ba
     // TODO: verify.
     action_bar->background_color = background_color;
 }
+
+#pragma mark - Number Window
 
 void number_window_init(NumberWindow *numberwindow, const char *label, NumberWindowCallbacks callbacks, void *callback_context)
 {
@@ -2009,10 +2095,14 @@ int number_window_get_value(NumberWindow *numberwindow)
     }
 }
 
+#pragma mark - Time
+
 void clock_copy_time_string(char *buffer, uint8_t size)
 {
     // TODO: figure it out.
 }
+
+#pragma mark - Bitmap
 
 void gbitmap_init_as_sub_bitmap(GBitmap *sub_bitmap, const GBitmap *base_bitmap, GRect sub_rect)
 {
@@ -2023,6 +2113,8 @@ void gbitmap_init_with_data(GBitmap *bitmap, const uint8_t *data)
 {
     // TODO: figure it out.
 }
+
+#pragma mark - App Sync
 
 void app_comm_set_sniff_interval(const SniffInterval interval)
 {
@@ -2067,15 +2159,21 @@ void app_log(uint8_t log_level, const char *src_filename, int src_line_number, c
     }
 }
 
+#pragma mark - Graphics Context
+
 void graphics_draw_rect(GContext *ctx, GRect rect)
 {
     // TODO: figure it out.
 }
 
+#pragma mark - Vibes
+
 void vibes_cancel(void)
 {
     // TODO: figure it out.
 }
+
+#pragma mark - Menu Layer
 
 MenuIndex menu_layer_get_selected_index(MenuLayer *menu_layer)
 {
@@ -2083,11 +2181,15 @@ MenuIndex menu_layer_get_selected_index(MenuLayer *menu_layer)
     return menu_layer->selection.index;
 }
 
+#pragma mark - Point
+
 bool gpoint_equal(const GPoint * const point_a, const GPoint * const point_b)
 {
     // TODO: verify.
     return point_a == point_b || (point_a->x == point_b->x && point_a->y == point_b->y);
 }
+
+#pragma mark - Rect
 
 bool grect_contains_point(GRect *rect, GPoint *point)
 {
@@ -2137,11 +2239,15 @@ void grect_standardize(GRect *rect)
         rect->origin.x -= (rect->size.w *= -1);
 }
 
+#pragma mark - Size
+
 bool gsize_equal(GSize *size_a, GSize *size_b)
 {
     // TODO: verify.
     return size_a == size_b || (size_a->h == size_b->h && size_a->w == size_b->w);
 }
+
+#pragma mark - Time
 
 time_t pbl_override_time(time_t *tloc)
 {
