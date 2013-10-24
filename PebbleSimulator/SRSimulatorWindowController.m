@@ -9,8 +9,8 @@
 #import "SRSimulatorWindowController.h"
 
 @implementation SRSimulatorWindowController
-@synthesize backButton, upButton, selectButton, downButton;
-
+@synthesize backButton, upButton, selectButton, downButton, displayView;
+void redisplayCallback();
 static SRSimulatorWindowController * sharedInstance = nil;
 
 - (void)windowWillClose:(NSNotification *)notification
@@ -18,7 +18,6 @@ static SRSimulatorWindowController * sharedInstance = nil;
     NSLog(@"%s", __func__);
     [application stopPebbleApplication];
     [application release];
-    [[self displayView] releaseGState];
 }
 
 - (void)runPebbleApplicationAtURL:(NSURL *)url
@@ -32,22 +31,32 @@ static SRSimulatorWindowController * sharedInstance = nil;
     application = [[SRPebbleApplication alloc] initWithPebbleApplicationAtPath:[url path]];
     [url release];
     [self showWindow:self];
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateWithName(kCGColorSpaceGenericGray);
+    CGContextRef ctx = CGBitmapContextCreate(NULL, 144, 168, 8, 144, colorSpace, 0);
+    CGColorSpaceRelease(colorSpace);
+    [[self displayView] setBitmapContext:ctx];
     [application runPebbleApplicationInBackgroundWithParameters:(SimulatorParams){
         .backButton = backButton,
         .upButton = upButton,
         .selectButton = selectButton,
         .downButton = downButton,
         .graphicsContext = (SimulatorGContext){
-            .coreGraphicsContext = 0,
+            .coreGraphicsContext = ctx,
             .compositingMode = 0
         },
-        
+        .redisplay = &redisplayCallback
     }];
 }
 
 + (SRSimulatorWindowController *)sharedController
 {
-    return sharedInstance ? sharedInstance : [[SRSimulatorWindowController alloc] initWithWindowNibName:@"SimulatorWindow"];
+    return sharedInstance ? sharedInstance : (sharedInstance = [[SRSimulatorWindowController alloc] initWithWindowNibName:@"SimulatorWindow"]);
+}
+
+void redisplayCallback()
+{
+    [[sharedInstance displayView] display];
+    //[[sharedInstance displayView] drawRect:[[sharedInstance displayView] bounds]];
 }
 
 @end

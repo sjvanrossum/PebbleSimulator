@@ -59,7 +59,6 @@
 {
     applicationContext = parameters;
     [self performSelectorInBackground:@selector(runPebbleApplication) withObject:nil];
-    [self performSelectorInBackground:@selector(runPebbleApplication) withObject:nil];
 
 }
 

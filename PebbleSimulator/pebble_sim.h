@@ -30,10 +30,12 @@ typedef struct _SimulatorParams
     
     SimulatorGContext graphicsContext;
     CFRunLoopRef runLoop;
+    bool displayDirty;
     void * backButton;
     void * upButton;
     void * selectButton;
     void * downButton;
+    void (*redisplay)();
     
     ClickConfig backConfig;
     ClickConfig upConfig;

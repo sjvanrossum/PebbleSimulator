@@ -11,8 +11,10 @@
 #import "pebble_sim.h"
 
 @interface SRPebbleSimView : NSView
+{
+    CGContextRef bitmapContext;
+}
 
-void setAppHandlers(PebbleAppHandlers * handlers);
-void setGraphicsContext(SimulatorGContext * context);
+@property(assign) CGContextRef bitmapContext;
 
 @end

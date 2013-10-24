@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <CoreGraphics/CoreGraphics.h>
 #import "SRPebbleApplication.h"
 #import "SRPebbleSimView.h"
 #import "SRPebbleButton.h"
@@ -15,6 +16,11 @@
 {
     // Variables
     @private SRPebbleApplication * application;
+    @private SRPebbleButton * upButton;
+    @private SRPebbleButton * downButton;
+    @private SRPebbleButton * selectButton;
+    @private SRPebbleButton * backButton;
+    @private SRPebbleSimView * displayView;
 }
 
 // Properties

@@ -13,23 +13,17 @@
 #include <dlfcn.h>
 
 @implementation SRPebbleSimView
-
-
-- (void)setUpGState
-{
-    CGContextRef graphicsContext = [[NSGraphicsContext currentContext] graphicsPort];
-    CGContextSetFillColorWithColor(graphicsContext, CGColorGetConstantColor(kCGColorBlack));
-    CGContextFillRect(graphicsContext, [self bounds]);
-    CGContextSetAllowsAntialiasing(graphicsContext, false);
-}
+@synthesize bitmapContext;
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-    CGContextRef graphicsContext = [[NSGraphicsContext currentContext] graphicsPort];
-    CGContextSetFillColorWithColor(graphicsContext, CGColorGetConstantColor(kCGColorBlack));
-    CGContextFillRect(graphicsContext, [self bounds]);
-    CGContextSetFillColorWithColor(graphicsContext, CGColorGetConstantColor(kCGColorWhite));
-    CGContextFillEllipseInRect(graphicsContext, [self bounds]);
+    NSLog(@"Drawing!");
+    if (self.bitmapContext)
+    {
+        CGImageRef display = CGBitmapContextCreateImage(self.bitmapContext);
+        CGContextDrawImage([[NSGraphicsContext currentContext] graphicsPort], CGRectMake(0, 0, 144, 168), display);
+        CGImageRelease(display);
+    }
 }
 
 @end

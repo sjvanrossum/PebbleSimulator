@@ -29,6 +29,9 @@ void animation_unschedule_applier(const void *key, const void *value, void *cont
 void app_timer_applier(const void *key, const void *value, void *context);
 void app_callback_loop(CFRunLoopTimerRef timer, void * info);
 
+void defaultRenderHandler(AppContextRef app_ctx, PebbleRenderEvent * event);
+void layer_render_recurse(Layer * l, GContext * ctx);
+
 #pragma mark - Animation
 
 void animation_init(struct Animation *animation)
@@ -227,6 +230,11 @@ void animation_update_applier(const void *key, const void *value, void *context)
     }
 }
 
+void defaultRenderHandler(AppContextRef app_ctx, PebbleRenderEvent * event)
+{
+    window_render(event->window, event->ctx);
+}
+
 void app_timer_applier(const void *key, const void *value, void *context)
 {
     // TODO: verify.
@@ -282,6 +290,14 @@ void app_callback_loop(CFRunLoopTimerRef timer, void * info)
                 handlers->tick_info.tick_handler(app_task_ctx, &((PebbleTickEvent) { .tick_time = &itmPblNow, .units_changed = units_changed }));
         }
         appParameters->pblNow = itmPblNow;
+
+        PebbleRenderEvent event = (PebbleRenderEvent){ .window = window_stack_get_top_window(), .ctx = (GContext *)&appParameters->graphicsContext};
+        if (handlers->render_handler)
+            handlers->render_handler((AppContextRef)app_task_ctx, &event);
+        else
+            defaultRenderHandler((AppContextRef)app_task_ctx, &event);
+        CGImageRef limg = CGBitmapContextCreateImage(appParameters->graphicsContext.coreGraphicsContext);
+        appParameters->redisplay();
     }
     ++(appParameters->uptime_ms);
 }
@@ -290,19 +306,20 @@ void app_event_loop(AppTaskContextRef app_task_ctx, PebbleAppHandlers *handlers)
 {
     // TODO: verify.
     // VERY IMPORTANT.
-    printf("%p\n", &appParameters->graphicsContext);
-    SimulatorParams * app_params = (SimulatorParams *)app_task_ctx;
+    appParameters = (SimulatorParams *)app_task_ctx;
+    appParameters->handlers = handlers;
     appParameters->animationCollection = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
+    appParameters->windowStack = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
     appParameters->appTimers = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
     
     //CFRunLoopSourceRef graphicsSource = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, 0);
     
     get_time(&appParameters->pblNow);
-    CFRunLoopTimerRef timer = CFRunLoopTimerCreate(kCFAllocatorDefault, CFAbsoluteTimeGetCurrent(), 1.0/1000.0, 0, 0, &app_callback_loop, &((CFRunLoopTimerContext){ .info = app_params }));
+    CFRunLoopTimerRef timer = CFRunLoopTimerCreate(kCFAllocatorDefault, CFAbsoluteTimeGetCurrent(), 1.0/1000.0, 0, 0, &app_callback_loop, &((CFRunLoopTimerContext){ .info = appParameters }));
     CFRunLoopAddTimer(CFRunLoopGetCurrent(), timer, kCFRunLoopDefaultMode);
     
     if (handlers->init_handler)
-        handlers->init_handler((AppContextRef)app_task_ctx);
+        handlers->init_handler((AppContextRef)appParameters);
     
     // PebbleKit doesn't do this itself and the watchapp is expected to call this in init.
     //if (handlers->tick_info.tick_handler)
@@ -382,13 +399,13 @@ void graphics_context_set_fill_color(GContext *ctx, GColor color)
     switch (color)
     {
         case GColorClear:
-            CGContextSetRGBFillColor(((SimulatorGContext *)ctx)->coreGraphicsContext, 0.0f, 0.0f, 0.0f, 0.0f);
+            CGContextSetGrayFillColor(((SimulatorGContext *)ctx)->coreGraphicsContext, 0.0f, 0.0f);
             break;
         case GColorBlack:
-            CGContextSetRGBFillColor(((SimulatorGContext *)ctx)->coreGraphicsContext, 0.0f, 0.0f, 0.0f, 1.0f);
+            CGContextSetGrayFillColor(((SimulatorGContext *)ctx)->coreGraphicsContext, 0.0f, 1.0f);
             break;
         case GColorWhite:
-            CGContextSetRGBFillColor(((SimulatorGContext *)ctx)->coreGraphicsContext, 1.0f, 1.0f, 1.0f, 1.0f);
+            CGContextSetGrayFillColor(((SimulatorGContext *)ctx)->coreGraphicsContext, 1.0f, 1.0f);
             break;
         default:
             // Just do it, can't touch this.
@@ -823,12 +840,25 @@ void window_render(Window *window, GContext *ctx)
     // TODO: verify.
     if (window)
     {
-        if (window->is_loaded && window->on_screen);
-        {
-            layer_mark_dirty(&window->layer);
-            window->is_render_scheduled = true;
-        }
+        if (&window->layer)
+            layer_render_recurse(&window->layer, ctx);
     }
+}
+
+void layer_render_recurse(Layer * l, GContext * ctx)
+{
+    CGContextSaveGState(((SimulatorGContext *)ctx)->coreGraphicsContext);
+    if (l->clips)
+        CGContextClipToRect(((SimulatorGContext *)ctx)->coreGraphicsContext, CGRectMake(l->frame.origin.x, l->frame.origin.y, l->frame.size.w, l->frame.size.h));
+    CGContextTranslateCTM(((SimulatorGContext *)ctx)->coreGraphicsContext, l->frame.origin.x, l->frame.origin.y);
+    l->update_proc(l, ctx);
+    Layer * lc = l->first_child;
+    while (lc)
+    {
+        layer_render_recurse(lc, ctx);
+        lc = lc->next_sibling;
+    }
+    CGContextRestoreGState(((SimulatorGContext *)ctx)->coreGraphicsContext);
 }
 
 void window_set_fullscreen(Window *window, bool enabled)
@@ -956,6 +986,7 @@ bool clock_is_24h_style(void)
 void property_animation_init_layer_frame(struct PropertyAnimation *property_animation, struct Layer *layer, GRect *from_frame, GRect *to_frame)
 {
     // TODO: malloc/init.
+    property_animation_init(property_animation, NULL, layer, from_frame, to_frame);
 }
 
 #pragma mark - Text Layer
@@ -1415,9 +1446,10 @@ Window *window_stack_get_top_window(void)
 {
     // TODO: verify.
     CFIndex idx = CFArrayGetCount(appParameters->windowStack) - 1;
-    Window* window = (Window *)CFArrayGetValueAtIndex(appParameters->windowStack, idx);
-    
-    return window;
+    if (idx >= 0)
+        return (Window *)CFArrayGetValueAtIndex(appParameters->windowStack, idx);
+    else
+        return NULL;
 }
 
 Window *window_stack_remove(Window *window, bool animated)
@@ -1429,8 +1461,14 @@ Window *window_stack_remove(Window *window, bool animated)
 
 void property_animation_init(struct PropertyAnimation *property_animation, const struct PropertyAnimationImplementation *implementation, void *subject, void *from_value, void *to_value)
 {
-    // TODO: malloc/init.
+    // TODO: verify.
+    animation_init((Animation *)property_animation);
     property_animation->animation.implementation = (AnimationImplementation *)&implementation;
+
+    // Poisonous stuff, assuming the values are readable up to the size of a GRect. It's the only way to make sure we copy the values correctly.
+    property_animation->values.from.grect = *(GRect *)from_value;
+    property_animation->values.to.grect = *(GRect *)to_value;
+
     property_animation->subject = subject;
 }
 
