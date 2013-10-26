@@ -286,17 +286,21 @@ void app_callback_loop(CFRunLoopTimerRef timer, void * info)
             if (flags & SECOND_UNIT && itmPblNow.tm_sec != appParameters->pblNow.tm_sec)
                 units_changed |= SECOND_UNIT;
             
-            if (units_changed != 0)
+            if (units_changed)
                 handlers->tick_info.tick_handler(app_task_ctx, &((PebbleTickEvent) { .tick_time = &itmPblNow, .units_changed = units_changed }));
         }
         appParameters->pblNow = itmPblNow;
 
-        PebbleRenderEvent event = (PebbleRenderEvent){ .window = window_stack_get_top_window(), .ctx = (GContext *)&appParameters->graphicsContext};
-        if (handlers->render_handler)
-            handlers->render_handler((AppContextRef)app_task_ctx, &event);
-        else
-            defaultRenderHandler((AppContextRef)app_task_ctx, &event);
-        CGImageRef limg = CGBitmapContextCreateImage(appParameters->graphicsContext.coreGraphicsContext);
+        Window * w = window_stack_get_top_window();
+        if (w)
+        {
+            CGContextClearRect(appParameters->graphicsContext.coreGraphicsContext, CGRectMake(0, 0, CGBitmapContextGetWidth(appParameters->graphicsContext.coreGraphicsContext), CGBitmapContextGetHeight(appParameters->graphicsContext.coreGraphicsContext)));
+            PebbleRenderEvent event = (PebbleRenderEvent){ .window = w, .ctx = (GContext *)&appParameters->graphicsContext};
+            if (handlers->render_handler)
+                handlers->render_handler((AppContextRef)app_task_ctx, &event);
+            else
+                defaultRenderHandler((AppContextRef)app_task_ctx, &event);
+        }
         appParameters->redisplay();
     }
     ++(appParameters->uptime_ms);
@@ -782,7 +786,7 @@ void window_init(Window *window, const char *debug_name)
     // TODO: verify.
     *window = (Window)
     {
-        .layer = (Layer) { GRectZero, GRectZero, 1, 1, NULL, NULL, NULL, window, NULL },
+        .layer = (Layer) { GRect(0, 0, 144, 168), GRect(0, 0, 144, 168), 1, 1, NULL, NULL, NULL, window, NULL },
         .status_bar_icon = NULL,
         .input_handlers = (WindowInputHandlers)
         {

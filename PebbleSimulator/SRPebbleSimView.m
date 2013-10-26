@@ -17,7 +17,6 @@
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-    NSLog(@"Drawing!");
     if (self.bitmapContext)
     {
         CGImageRef display = CGBitmapContextCreateImage(self.bitmapContext);

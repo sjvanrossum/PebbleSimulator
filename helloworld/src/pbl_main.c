@@ -7,13 +7,14 @@
 //
 
 #include "pebble_os.h"
+#include <CoreGraphics/CoreGraphics.h>
 
 Window window;
 
 void rootupdate(Layer * layer, GContext * ctx)
 {
     graphics_context_set_fill_color(ctx, GColorWhite);
-    graphics_fill_rect(ctx, GRect(0,0,144,168), 0, 0);
+    graphics_fill_circle(ctx, GPointZero, 100);
 }
 
 void handle_init(AppContextRef app_ctx)
