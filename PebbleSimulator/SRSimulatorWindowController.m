@@ -35,6 +35,8 @@ static SRSimulatorWindowController * sharedInstance = nil;
     CGContextRef ctx = CGBitmapContextCreate(NULL, 144, 168, 8, 144, colorSpace, 0);
     CGColorSpaceRelease(colorSpace);
     CGContextSetAllowsAntialiasing(ctx, false);
+    CGContextScaleCTM(ctx, 1.0f, -1.0f);
+    CGContextTranslateCTM(ctx, 0, -168);
     [[self displayView] setBitmapContext:ctx];
     [application runPebbleApplicationInBackgroundWithParameters:(SimulatorParams){
         .backButton = backButton,
