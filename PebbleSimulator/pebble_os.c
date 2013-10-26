@@ -29,7 +29,7 @@ void animation_unschedule_applier(const void *key, const void *value, void *cont
 void app_timer_applier(const void *key, const void *value, void *context);
 void app_callback_loop(CFRunLoopTimerRef timer, void * info);
 
-void defaultRenderHandler(AppContextRef app_ctx, PebbleRenderEvent * event);
+void default_render_handler(AppContextRef app_ctx, PebbleRenderEvent * event);
 void layer_render_recurse(Layer * l, GContext * ctx);
 
 #pragma mark - Animation
@@ -230,7 +230,7 @@ void animation_update_applier(const void *key, const void *value, void *context)
     }
 }
 
-void defaultRenderHandler(AppContextRef app_ctx, PebbleRenderEvent * event)
+void default_render_handler(AppContextRef app_ctx, PebbleRenderEvent * event)
 {
     window_render(event->window, event->ctx);
 }
@@ -299,7 +299,7 @@ void app_callback_loop(CFRunLoopTimerRef timer, void * info)
             if (handlers->render_handler)
                 handlers->render_handler((AppContextRef)app_task_ctx, &event);
             else
-                defaultRenderHandler((AppContextRef)app_task_ctx, &event);
+                default_render_handler((AppContextRef)app_task_ctx, &event);
         }
         appParameters->redisplay();
     }
