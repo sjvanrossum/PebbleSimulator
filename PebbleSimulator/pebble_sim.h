@@ -20,6 +20,44 @@ typedef struct _SimulatorGContext {
     GCompOp compositingMode;
 } SimulatorGContext;
 
+typedef struct _SimulatorBitmap
+{
+    uint16_t rowSizeBytes;
+    uint16_t infoFlags;
+    GRect bounds;
+    uint8_t data[0];
+} SimulatorBitmap;
+
+typedef struct _SimulatorFontGlyph
+{
+    uint16_t unknown;
+    char glyph[2];
+} SimulatorFontGlyph;
+
+typedef struct _SimulatorFont
+{
+
+} SimulatorFont;
+
+typedef struct _SimulatorResource
+{
+    uint32_t index;
+    uint32_t offset;
+    uint32_t size;
+    uint32_t crc;
+} SimulatorResource;
+
+typedef struct _SimulatorResourcePack
+{
+    uint32_t resourceCount;
+    uint32_t crcManifest;
+    uint32_t unknown;
+    char friendlyVersion[16];
+    SimulatorResource resourceManifest[256];
+    uint8_t resourceData[0];
+
+} SimulatorResourcePack;
+
 typedef struct _SimulatorParams
 {
     PebbleAppHandlers * handlers;
