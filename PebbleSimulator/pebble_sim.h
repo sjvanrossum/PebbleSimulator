@@ -28,14 +28,30 @@ typedef struct _SimulatorBitmap
     uint8_t data[0];
 } SimulatorBitmap;
 
-typedef struct _SimulatorFontGlyph
+typedef struct _SimulatorFontGlyphIndex
 {
-    uint16_t unknown;
-    char glyph[2];
-} SimulatorFontGlyph;
+    uint16_t codepoint;
+    uint16_t offset;
+} SimulatorFontGlyphIndex;
+
+typedef struct _SimulatorFontGlyphEntry
+{
+    uint8_t width;
+    uint8_t height;
+    int8_t top;
+    int8_t left;
+    int8_t advance;
+    uint32_t data[];
+} SimulatorFontGlyphEntry;
 
 typedef struct _SimulatorFont
 {
+    uint8_t version;
+    uint8_t max_height;
+    uint16_t number_of_glyphs;
+    uint16_t wildcard_codepoint;
+    SimulatorFontGlyphIndex indices[0];
+    SimulatorFontGlyphEntry entries[0];
 
 } SimulatorFont;
 
